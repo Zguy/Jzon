@@ -1,0 +1,21 @@
+﻿Build started 2011-03-02 17:00:27.
+     1>Project "C:\Users\Johannes\Documents\Projekt\Program\Jzon\Jzon\Jzon.vcxproj" on node 2 (build target(s)).
+     1>InitializeBuildStatus:
+         Creating "C:\Users\Johannes\Documents\Projekt\Program\Jzon\Jzon\\obj\Debug\Jzon.unsuccessfulbuild" because "AlwaysCreate" was specified.
+       ClCompile:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _LIB /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"C:\Users\Johannes\Documents\Projekt\Program\Jzon\Jzon\\obj\Debug\\" /Fd"C:\Users\Johannes\Documents\Projekt\Program\Jzon\Jzon\\obj\Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt src\Jzon.cpp
+         Jzon.cpp
+     1>c:\users\johannes\documents\projekt\program\jzon\jzon\src\jzon.cpp(40): warning C4715: 'Jzon::Node::AsObject' : not all control paths return a value
+     1>c:\users\johannes\documents\projekt\program\jzon\jzon\src\jzon.cpp(45): warning C4715: 'Jzon::Node::AsArray' : not all control paths return a value
+     1>c:\users\johannes\documents\projekt\program\jzon\jzon\src\jzon.cpp(50): warning C4715: 'Jzon::Node::AsValue' : not all control paths return a value
+       Lib:
+         C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC\bin\Lib.exe /OUT:"C:\Users\Johannes\Documents\Projekt\Program\Jzon\Jzon\\lib\Jzon_d.lib" /NOLOGO C:\Users\Johannes\Documents\Projekt\Program\Jzon\Jzon\\obj\Debug\Jzon.obj
+         Jzon.vcxproj -> C:\Users\Johannes\Documents\Projekt\Program\Jzon\Jzon\\lib\Jzon_d.lib
+       FinalizeBuildStatus:
+         Deleting file "C:\Users\Johannes\Documents\Projekt\Program\Jzon\Jzon\\obj\Debug\Jzon.unsuccessfulbuild".
+         Touching "C:\Users\Johannes\Documents\Projekt\Program\Jzon\Jzon\\obj\Debug\Jzon.lastbuildstate".
+     1>Done Building Project "C:\Users\Johannes\Documents\Projekt\Program\Jzon\Jzon\Jzon.vcxproj" (build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:01.19
