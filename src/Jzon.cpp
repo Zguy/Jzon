@@ -52,7 +52,7 @@ namespace Jzon
 	NodePtr Node::Read(const std::string &json)
 	{
 		if (json.size() == 0)
-			return NULL;
+			return NodePtr(new Value());
 
 		std::string node;
 		Type lookFor;
@@ -104,7 +104,7 @@ namespace Jzon
 			}
 		}
 
-		return NULL;
+		return NodePtr(new Value());
 	}
 
 
@@ -425,8 +425,7 @@ namespace Jzon
 				if (((numOpen == 1 && !inString && c == ','))||(numOpen == 0))
 				{
 					NodePtr node = Node::Read(value);
-					if (node != NULL)
-						object->Add(name, *node);
+					object->Add(name, *node);
 
 					name.clear();
 					value.clear();
@@ -537,8 +536,7 @@ namespace Jzon
 			if (((numOpen == 1 && !inString && c == ','))||(numOpen == 0))
 			{
 				NodePtr node = Node::Read(value);
-				if (node != NULL)
-					array->Add(*node);
+				array->Add(*node);
 
 				value.clear();
 			}
@@ -597,7 +595,7 @@ namespace Jzon
 		std::string json;
 		std::fstream file(filename.c_str(), std::ios::in);
 		if (!file.is_open())
-			return NULL;
+			return NodePtr(new Value());
 
 		while (!file.eof())
 		{
