@@ -25,11 +25,14 @@ THE SOFTWARE.
 #include <string>
 #include <vector>
 #include <memory>
+#include <iterator>
 
 namespace Jzon
 {
 	class Node;
 	typedef std::shared_ptr<Node> NodePtr;
+	typedef std::pair<std::string, NodePtr> NamedNodePtr;
+	typedef std::pair<std::string, Node&> NamedNode;
 	class Object;
 	typedef std::shared_ptr<Object> ObjectPtr;
 	class Array;
@@ -114,6 +117,24 @@ namespace Jzon
 	class Object : public Node
 	{
 	public:
+		class Iterator : public std::iterator<std::input_iterator_tag, NamedNodePtr>
+		{
+		public:
+			Iterator(NamedNodePtr *o) : p(o) {}
+			Iterator(const Iterator &it) : p(it.p) {}
+
+			Iterator &operator++() { ++p; return *this; }
+			Iterator operator++(int) { Iterator tmp(*this); operator++(); return tmp; }
+
+			bool operator==(const Iterator &rhs) { return p == rhs.p; }
+			bool operator!=(const Iterator &rhs) { return p != rhs.p; }
+
+			NamedNode operator*() { return NamedNode(p->first, *p->second); }
+
+		private:
+			NamedNodePtr *p;
+		};
+
 		Object();
 		Object(const Object &other);
 		virtual ~Object();
@@ -125,6 +146,9 @@ namespace Jzon
 		void Add(const std::string &name, Value node);
 		void Remove(const std::string &name);
 
+		Iterator Begin();
+		Iterator End();
+
 		Node &Get(const std::string &name, Node &default = Value()) const;
 
 		virtual std::string Write() const;
@@ -133,13 +157,31 @@ namespace Jzon
 		virtual NodePtr GetCopy() const;
 
 	private:
-		typedef std::vector<std::pair<std::string, NodePtr> > ChildList;
+		typedef std::vector<NamedNodePtr> ChildList;
 		ChildList children;
 	};
 
 	class Array : public Node
 	{
 	public:
+		class Iterator : public std::iterator<std::input_iterator_tag, NodePtr>
+		{
+		public:
+			Iterator(NodePtr *o) : p(o) {}
+			Iterator(const Iterator &it) : p(it.p) {}
+
+			Iterator &operator++() { ++p; return *this; }
+			Iterator operator++(int) { Iterator tmp(*this); operator++(); return tmp; }
+
+			bool operator==(const Iterator &rhs) { return p == rhs.p; }
+			bool operator!=(const Iterator &rhs) { return p != rhs.p; }
+
+			Node &operator*() { return **p; }
+
+		private:
+			NodePtr *p;
+		};
+
 		Array();
 		Array(const Array &other);
 		virtual ~Array();
@@ -150,6 +192,9 @@ namespace Jzon
 		void Add(NodePtr node);
 		void Add(Value node);
 		void Remove(unsigned int index);
+
+		Iterator Begin();
+		Iterator End();
 
 		unsigned int GetCount() const;
 		Node &Get(unsigned int index, Node &default = Value()) const;

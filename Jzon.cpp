@@ -361,6 +361,15 @@ namespace Jzon
 		}
 	}
 
+	Object::Iterator Object::Begin()
+	{
+		return Object::Iterator(&children.front());
+	}
+	Object::Iterator Object::End()
+	{
+		return Object::Iterator(&children.back()+1);
+	}
+
 	Node &Object::Get(const std::string &name, Node &default) const
 	{
 		for (ChildList::const_iterator it = children.cbegin(); it != children.cend(); ++it)
@@ -486,6 +495,15 @@ namespace Jzon
 	{
 		if (index < children.size())
 			children.erase(children.begin()+index);
+	}
+
+	Array::Iterator Array::Begin()
+	{
+		return Array::Iterator(&children.front());
+	}
+	Array::Iterator Array::End()
+	{
+		return Array::Iterator(&children.back()+1);
 	}
 
 	unsigned int Array::GetCount() const
