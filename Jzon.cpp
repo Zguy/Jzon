@@ -341,6 +341,10 @@ namespace Jzon
 	{
 		children.push_back(std::make_pair<std::string, NodePtr>(name, node.GetCopy()));
 	}
+	void Object::Add(const std::string &name, NodePtr node)
+	{
+		children.push_back(std::make_pair<std::string, NodePtr>(name, node->GetCopy()));
+	}
 	void Object::Add(const std::string &name, Value node)
 	{
 		children.push_back(std::make_pair<std::string, NodePtr>(name, node.GetCopy()));
@@ -470,6 +474,10 @@ namespace Jzon
 	{
 		children.push_back(node.GetCopy());
 	}
+	void Array::Add(NodePtr node)
+	{
+		children.push_back(node->GetCopy());
+	}
 	void Array::Add(Value node)
 	{
 		children.push_back(node.GetCopy());
@@ -568,12 +576,20 @@ namespace Jzon
 		FileWriter writer;
 		writer.Write(filename, root);
 	}
+	void FileWriter::WriteFile(const std::string &filename, NodePtr root)
+	{
+		WriteFile(filename, *root);
+	}
 
 	void FileWriter::Write(const std::string &filename, Node &root)
 	{
 		std::fstream file(filename.c_str(), std::ios::out | std::ios::trunc);
 		file << root.Write();
 		file.close();
+	}
+	void FileWriter::Write(const std::string &filename, NodePtr root)
+	{
+		Write(filename, *root);
 	}
 
 

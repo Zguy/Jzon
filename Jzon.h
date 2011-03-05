@@ -121,6 +121,7 @@ namespace Jzon
 		virtual Type GetType() const;
 
 		void Add(const std::string &name, Node &node);
+		void Add(const std::string &name, NodePtr node);
 		void Add(const std::string &name, Value node);
 		void Remove(const std::string &name);
 
@@ -146,6 +147,7 @@ namespace Jzon
 		virtual Type GetType() const;
 
 		void Add(Node &node);
+		void Add(NodePtr node);
 		void Add(Value node);
 		void Remove(unsigned int index);
 
@@ -169,8 +171,10 @@ namespace Jzon
 		~FileWriter();
 
 		static void WriteFile(const std::string &filename, Node &root);
+		static void WriteFile(const std::string &filename, NodePtr root);
 
 		void Write(const std::string &filename, Node &root);
+		void Write(const std::string &filename, NodePtr root);
 	};
 
 	class FileReader
