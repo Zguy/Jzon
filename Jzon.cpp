@@ -112,6 +112,11 @@ namespace Jzon
 		: valueStr(""), type(VT_NULL)
 	{
 	}
+	Value::Value(const Value &rhs)
+	{
+		valueStr = rhs.valueStr;
+		type = rhs.type;
+	}
 	Value::Value(const std::string &value)
 		: valueStr(value), type(VT_STRING)
 	{
@@ -121,32 +126,27 @@ namespace Jzon
 	{
 
 	}
-	Value::Value(int value)
+	Value::Value(const int value)
 		: type(VT_INT)
 	{
 		std::stringstream sstr;
 		sstr << value;
 		valueStr = sstr.str();
 	}
-	Value::Value(double value)
+	Value::Value(const double value)
 		: type(VT_DOUBLE)
 	{
 		std::stringstream sstr;
 		sstr << value;
 		valueStr = sstr.str();
 	}
-	Value::Value(bool value)
+	Value::Value(const bool value)
 		: type(VT_BOOL)
 	{
 		if (value)
 			valueStr = "true";
 		else
 			valueStr = "false";
-	}
-	Value::Value(const Value &other)
-	{
-		valueStr = other.valueStr;
-		type = other.type;
 	}
 	Value::~Value()
 	{
@@ -209,6 +209,14 @@ namespace Jzon
 		valueStr = "";
 		type = VT_NULL;
 	}
+	void Value::Set(const Value &value)
+	{
+		if (this != &value)
+		{
+			valueStr = value.valueStr;
+			type = value.type;
+		}
+	}
 	void Value::Set(const std::string &value)
 	{
 		valueStr = value;
@@ -219,27 +227,68 @@ namespace Jzon
 		valueStr = std::string(value);
 		type = VT_STRING;
 	}
-	void Value::Set(int value)
+	void Value::Set(const int value)
 	{
 		std::stringstream sstr;
 		sstr << value;
 		valueStr = sstr.str();
 		type = VT_INT;
 	}
-	void Value::Set(double value)
+	void Value::Set(const double value)
 	{
 		std::stringstream sstr;
 		sstr << value;
 		valueStr = sstr.str();
 		type = VT_DOUBLE;
 	}
-	void Value::Set(bool value)
+	void Value::Set(const bool value)
 	{
 		if (value)
 			valueStr = "true";
 		else
 			valueStr = "false";
 		type = VT_BOOL;
+	}
+
+	Value &Value::operator=(const Value &rhs)
+	{
+		if (this != &rhs)
+			Set(rhs);
+		return *this;
+	}
+	Value &Value::operator=(const std::string &rhs)
+	{
+		Set(rhs);
+		return *this;
+	}
+	Value &Value::operator=(const char *rhs)
+	{
+		Set(rhs);
+		return *this;
+	}
+	Value &Value::operator=(const int rhs)
+	{
+		Set(rhs);
+		return *this;
+	}
+	Value &Value::operator=(const double rhs)
+	{
+		Set(rhs);
+		return *this;
+	}
+	Value &Value::operator=(const bool rhs)
+	{
+		Set(rhs);
+		return *this;
+	}
+
+	bool Value::operator==(const Value &other) const
+	{
+		return ((type == other.type)&&(valueStr == other.valueStr));
+	}
+	bool Value::operator!=(const Value &other) const
+	{
+		return !(*this == other);
 	}
 
 	std::string Value::Write() const

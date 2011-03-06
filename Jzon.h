@@ -78,12 +78,12 @@ namespace Jzon
 		};
 
 		Value();
+		Value(const Value &rhs);
 		Value(const std::string &value);
 		Value(const char *value);
-		Value(int value);
-		Value(double value);
-		Value(bool value);
-		Value(const Value &other);
+		Value(const int value);
+		Value(const double value);
+		Value(const bool value);
 		virtual ~Value();
 
 		virtual Type GetType() const;
@@ -96,11 +96,22 @@ namespace Jzon
 		bool AsBool() const;
 
 		void SetNull();
+		void Set(const Value &value);
 		void Set(const std::string &value);
 		void Set(const char *value);
-		void Set(int value);
-		void Set(double value);
-		void Set(bool value);
+		void Set(const int value);
+		void Set(const double value);
+		void Set(const bool value);
+
+		Value &operator=(const Value &rhs);
+		Value &operator=(const std::string &rhs);
+		Value &operator=(const char *rhs);
+		Value &operator=(const int rhs);
+		Value &operator=(const double rhs);
+		Value &operator=(const bool rhs);
+
+		bool operator==(const Value &other) const;
+		bool operator!=(const Value &other) const;
 
 		virtual std::string Write() const;
 		static NodePtr Read(const std::string &json);
