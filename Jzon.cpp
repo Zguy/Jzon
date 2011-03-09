@@ -35,17 +35,17 @@ namespace Jzon
 
 	Object &Node::AsObject()
 	{
-		if (GetType() == T_OBJECT)
+		if (IsObject())
 			return static_cast<Object&>(*this);
 	}
 	Array &Node::AsArray()
 	{
-		if (GetType() == T_ARRAY)
+		if (IsArray())
 			return static_cast<Array&>(*this);
 	}
 	Value &Node::AsValue()
 	{
-		if (GetType() == T_VALUE)
+		if (IsValue())
 			return static_cast<Value&>(*this);
 	}
 
@@ -412,11 +412,17 @@ namespace Jzon
 
 	Object::Iterator Object::Begin()
 	{
-		return Object::Iterator(&children.front());
+		if (children.size() > 0)
+			return Object::Iterator(&children.front());
+		else
+			return Object::Iterator(NULL);
 	}
 	Object::Iterator Object::End()
 	{
-		return Object::Iterator(&children.back()+1);
+		if (children.size() > 0)
+			return Object::Iterator(&children.back()+1);
+		else
+			return Object::Iterator(NULL);
 	}
 
 	Node &Object::Get(const std::string &name, Node &default) const
@@ -486,8 +492,11 @@ namespace Jzon
 			{
 				if (((numOpen == 1 && !inString && c == ','))||(numOpen == 0))
 				{
-					NodePtr node = Node::Read(value);
-					object->Add(name, *node);
+					if (!value.empty())
+					{
+						NodePtr node = Node::Read(value);
+						object->Add(name, *node);
+					}
 
 					name.clear();
 					value.clear();
@@ -548,11 +557,17 @@ namespace Jzon
 
 	Array::Iterator Array::Begin()
 	{
-		return Array::Iterator(&children.front());
+		if (children.size() > 0)
+			return Array::Iterator(&children.front());
+		else
+			return Array::Iterator(NULL);
 	}
 	Array::Iterator Array::End()
 	{
-		return Array::Iterator(&children.back()+1);
+		if (children.size() > 0)
+			return Array::Iterator(&children.back()+1);
+		else
+			return Array::Iterator(NULL);
 	}
 
 	unsigned int Array::GetCount() const
@@ -610,8 +625,11 @@ namespace Jzon
 
 			if (((numOpen == 1 && !inString && c == ','))||(numOpen == 0))
 			{
-				NodePtr node = Node::Read(value);
-				array->Add(*node);
+				if (!value.empty())
+				{
+					NodePtr node = Node::Read(value);
+					array->Add(*node);
+				}
 
 				value.clear();
 			}

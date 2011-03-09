@@ -59,6 +59,10 @@ namespace Jzon
 		Array &AsArray();
 		Value &AsValue();
 
+		inline bool IsObject() const { return (GetType() == T_OBJECT); }
+		inline bool IsArray() const { return (GetType() == T_ARRAY); }
+		inline bool IsValue() const { return (GetType() == T_VALUE); }
+
 		virtual std::string Write() const = 0;
 		static NodePtr Read(const std::string &json);
 
