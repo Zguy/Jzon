@@ -37,16 +37,22 @@ namespace Jzon
 	{
 		if (IsObject())
 			return static_cast<Object&>(*this);
+		else
+			throw TypeException();
 	}
 	Array &Node::AsArray()
 	{
 		if (IsArray())
 			return static_cast<Array&>(*this);
+		else
+			throw TypeException();
 	}
 	Value &Node::AsValue()
 	{
 		if (IsValue())
 			return static_cast<Value&>(*this);
+		else
+			throw TypeException();
 	}
 
 	NodePtr Node::Read(const std::string &json)

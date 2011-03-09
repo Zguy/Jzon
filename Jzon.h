@@ -24,8 +24,10 @@ THE SOFTWARE.
 
 #include <string>
 #include <vector>
+#include <utility>
 #include <memory>
 #include <iterator>
+#include <exception>
 
 namespace Jzon
 {
@@ -40,6 +42,13 @@ namespace Jzon
 	class Value;
 	typedef std::shared_ptr<Value> ValuePtr;
 	
+	class TypeException : public std::exception
+	{
+	public:
+		TypeException() : std::exception("A Node was used as the wrong type")
+		{}
+	};
+
 	class Node
 	{
 	public:
