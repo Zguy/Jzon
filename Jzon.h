@@ -49,6 +49,16 @@ namespace Jzon
 		{}
 	};
 
+	struct Format
+	{
+		bool newline;
+		bool spacing;
+		bool useTabs;
+		unsigned int indentSize;
+	};
+	static const Format StandardFormat = { true, true, true, 0 };
+	static const Format NoFormat = { false, false, false, 0 };
+
 	class Node
 	{
 	public:
@@ -72,7 +82,7 @@ namespace Jzon
 		inline bool IsArray() const { return (GetType() == T_ARRAY); }
 		inline bool IsValue() const { return (GetType() == T_VALUE); }
 
-		virtual std::string Write() const = 0;
+		virtual std::string Write(const Format &format = NoFormat, unsigned int level = 0) const = 0;
 		static NodePtr Read(const std::string &json);
 
 		virtual NodePtr GetCopy() const = 0;
@@ -126,7 +136,7 @@ namespace Jzon
 		bool operator==(const Value &other) const;
 		bool operator!=(const Value &other) const;
 
-		virtual std::string Write() const;
+		virtual std::string Write(const Format &format = NoFormat, unsigned int level = 0) const;
 		static NodePtr Read(const std::string &json);
 
 		virtual NodePtr GetCopy() const;
@@ -175,7 +185,7 @@ namespace Jzon
 
 		Node &Get(const std::string &name, Node &default = Value()) const;
 
-		virtual std::string Write() const;
+		virtual std::string Write(const Format &format = NoFormat, unsigned int level = 0) const;
 		static NodePtr Read(const std::string &json);
 
 		virtual NodePtr GetCopy() const;
@@ -223,7 +233,7 @@ namespace Jzon
 		unsigned int GetCount() const;
 		Node &Get(unsigned int index, Node &default = Value()) const;
 
-		virtual std::string Write() const;
+		virtual std::string Write(const Format &format = NoFormat, unsigned int level = 0) const;
 		static NodePtr Read(const std::string &json);
 
 		virtual NodePtr GetCopy() const;
@@ -239,11 +249,11 @@ namespace Jzon
 		FileWriter();
 		~FileWriter();
 
-		static void WriteFile(const std::string &filename, Node &root);
-		static void WriteFile(const std::string &filename, NodePtr root);
+		static void WriteFile(const std::string &filename, Node &root, const Format &format = NoFormat);
+		static void WriteFile(const std::string &filename, NodePtr root, const Format &format = NoFormat);
 
-		void Write(const std::string &filename, Node &root);
-		void Write(const std::string &filename, NodePtr root);
+		void Write(const std::string &filename, Node &root, const Format &format = NoFormat);
+		void Write(const std::string &filename, NodePtr root, const Format &format = NoFormat);
 	};
 
 	class FileReader
