@@ -43,8 +43,8 @@ namespace Jzon
 				}
 			}
 
-			newline = (format.newline ? "\n" : "");
 			spacing = (format.spacing ? " " : "");
+			newline = (format.newline ? "\n" : spacing);
 		}
 
 		std::string GetIndentation(unsigned int level) const
