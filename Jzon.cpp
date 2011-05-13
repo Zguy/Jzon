@@ -236,10 +236,15 @@ namespace Jzon
 			return 0;
 		else
 		{
-			std::stringstream sstr(valueStr);
-			int val;
-			sstr >> val;
-			return val;
+			if (GetValueType() == VT_INT)
+			{
+				std::stringstream sstr(valueStr);
+				int val;
+				sstr >> val;
+				return val;
+			}
+			else
+				throw ValueException();
 		}
 	}
 	double Value::AsDouble() const
@@ -248,10 +253,15 @@ namespace Jzon
 			return 0.0;
 		else
 		{
-			std::stringstream sstr(valueStr);
-			double val;
-			sstr >> val;
-			return val;
+			if (GetValueType() == VT_DOUBLE)
+			{
+				std::stringstream sstr(valueStr);
+				double val;
+				sstr >> val;
+				return val;
+			}
+			else
+				throw ValueException();
 		}
 	}
 	bool Value::AsBool() const
@@ -259,7 +269,10 @@ namespace Jzon
 		if (IsNull())
 			return false;
 		else
-			return (valueStr == "true");
+			if (GetValueType() == VT_BOOL)
+				return (valueStr == "true");
+			else
+				throw ValueException();
 	}
 
 	void Value::SetNull()
@@ -383,7 +396,7 @@ namespace Jzon
 			{
 				char c = (*it);
 
-				if (c != '0' && c != '1' && c != '2' && c != '3' && c != '4' && c != '5' && c != '6' && c != '7' && c != '8' && c != '9' && c != '.')
+				if (c != '0' && c != '1' && c != '2' && c != '3' && c != '4' && c != '5' && c != '6' && c != '7' && c != '8' && c != '9' && c != '.' && c != '-')
 				{
 					onlyNumbers = false;
 				}

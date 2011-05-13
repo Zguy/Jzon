@@ -48,6 +48,12 @@ namespace Jzon
 		TypeException() : std::exception("A Node was used as the wrong type")
 		{}
 	};
+	class ValueException : public std::exception
+	{
+	public:
+		ValueException() : std::exception("A Value was used as the wrong type")
+		{}
+	};
 
 	struct Format
 	{
