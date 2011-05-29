@@ -81,8 +81,11 @@ namespace Jzon
 		virtual Type GetType() const = 0;
 
 		Object &AsObject();
+		const Object &AsObject() const;
 		Array &AsArray();
+		const Array &AsArray() const;
 		Value &AsValue();
+		const Value &AsValue() const;
 
 		inline bool IsObject() const { return (GetType() == T_OBJECT); }
 		inline bool IsArray() const { return (GetType() == T_ARRAY); }
@@ -108,6 +111,7 @@ namespace Jzon
 
 		Value();
 		Value(const Value &rhs);
+		Value(const Node &rhs);
 		Value(const std::string &value);
 		Value(const char *value);
 		Value(const int value);
@@ -138,6 +142,7 @@ namespace Jzon
 		void Set(const bool value);
 
 		Value &operator=(const Value &rhs);
+		Value &operator=(const Node &rhs);
 		Value &operator=(const std::string &rhs);
 		Value &operator=(const char *rhs);
 		Value &operator=(const int rhs);
@@ -182,6 +187,7 @@ namespace Jzon
 
 		Object();
 		Object(const Object &other);
+		Object(const Node &other);
 		virtual ~Object();
 
 		virtual Type GetType() const;
@@ -230,6 +236,7 @@ namespace Jzon
 
 		Array();
 		Array(const Array &other);
+		Array(const Node &other);
 		virtual ~Array();
 
 		virtual Type GetType() const;

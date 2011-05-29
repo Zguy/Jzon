@@ -92,6 +92,13 @@ namespace Jzon
 		else
 			throw TypeException();
 	}
+	const Object &Node::AsObject() const
+	{
+		if (IsObject())
+			return static_cast<const Object&>(*this);
+		else
+			throw TypeException();
+	}
 	Array &Node::AsArray()
 	{
 		if (IsArray())
@@ -99,10 +106,24 @@ namespace Jzon
 		else
 			throw TypeException();
 	}
+	const Array &Node::AsArray() const
+	{
+		if (IsArray())
+			return static_cast<const Array&>(*this);
+		else
+			throw TypeException();
+	}
 	Value &Node::AsValue()
 	{
 		if (IsValue())
 			return static_cast<Value&>(*this);
+		else
+			throw TypeException();
+	}
+	const Value &Node::AsValue() const
+	{
+		if (IsValue())
+			return static_cast<const Value&>(*this);
 		else
 			throw TypeException();
 	}
@@ -175,6 +196,12 @@ namespace Jzon
 		valueStr = rhs.valueStr;
 		type = rhs.type;
 	}
+	Value::Value(const Node &rhs)
+	{
+		const Value &value = rhs.AsValue();
+		valueStr = value.valueStr;
+		type = value.type;
+	}
 	Value::Value(const std::string &value)
 		: valueStr(value), type(VT_STRING)
 	{
@@ -182,7 +209,6 @@ namespace Jzon
 	Value::Value(const char *value)
 		: valueStr(std::string(value)), type(VT_STRING)
 	{
-
 	}
 	Value::Value(const int value)
 		: type(VT_INT)
@@ -323,6 +349,12 @@ namespace Jzon
 			Set(rhs);
 		return *this;
 	}
+	Value &Value::operator=(const Node &rhs)
+	{
+		if (this != &rhs)
+			Set(rhs.AsValue());
+		return *this;
+	}
 	Value &Value::operator=(const std::string &rhs)
 	{
 		Set(rhs);
@@ -437,6 +469,18 @@ namespace Jzon
 	Object::Object(const Object &other)
 	{
 		for (ChildList::const_iterator it = other.children.cbegin(); it != other.children.cend(); ++it)
+		{
+			const std::string &name = (*it).first;
+			Node &value = *(*it).second;
+
+			children.push_back(std::make_pair<std::string, NodePtr>(name, value.GetCopy()));
+		}
+	}
+	Object::Object(const Node &other)
+	{
+		const Object &object = other.AsObject();
+
+		for (ChildList::const_iterator it = object.children.cbegin(); it != object.children.cend(); ++it)
 		{
 			const std::string &name = (*it).first;
 			Node &value = *(*it).second;
@@ -595,6 +639,17 @@ namespace Jzon
 	Array::Array(const Array &other)
 	{
 		for (ChildList::const_iterator it = other.children.cbegin(); it != other.children.cend(); ++it)
+		{
+			const Node &value = *(*it);
+
+			children.push_back(value.GetCopy());
+		}
+	}
+	Array::Array(const Node &other)
+	{
+		const Array &array = other.AsArray();
+
+		for (ChildList::const_iterator it = array.children.cbegin(); it != array.children.cend(); ++it)
 		{
 			const Node &value = *(*it);
 
