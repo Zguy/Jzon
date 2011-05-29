@@ -118,11 +118,16 @@ namespace Jzon
 		virtual Type GetType() const;
 		ValueType GetValueType() const;
 
-		bool IsNull() const;
 		std::string AsString() const;
 		int AsInt() const;
 		double AsDouble() const;
 		bool AsBool() const;
+
+		inline bool IsNull() const { return (type == VT_NULL); }
+		inline bool IsString() const { return (type == VT_STRING); }
+		inline bool IsInt() const { return (type == VT_INT); }
+		inline bool IsDouble() const { return (type == VT_DOUBLE); }
+		inline bool IsBool() const { return (type == VT_BOOL); }
 
 		void SetNull();
 		void Set(const Value &value);
@@ -157,17 +162,17 @@ namespace Jzon
 	class Object : public Node
 	{
 	public:
-		class Iterator : public std::iterator<std::input_iterator_tag, NamedNodePtr>
+		class iterator : public std::iterator<std::input_iterator_tag, NamedNodePtr>
 		{
 		public:
-			Iterator(NamedNodePtr *o) : p(o) {}
-			Iterator(const Iterator &it) : p(it.p) {}
+			iterator(NamedNodePtr *o) : p(o) {}
+			iterator(const iterator &it) : p(it.p) {}
 
-			Iterator &operator++() { ++p; return *this; }
-			Iterator operator++(int) { Iterator tmp(*this); operator++(); return tmp; }
+			iterator &operator++() { ++p; return *this; }
+			iterator operator++(int) { iterator tmp(*this); operator++(); return tmp; }
 
-			bool operator==(const Iterator &rhs) { return p == rhs.p; }
-			bool operator!=(const Iterator &rhs) { return p != rhs.p; }
+			bool operator==(const iterator &rhs) { return p == rhs.p; }
+			bool operator!=(const iterator &rhs) { return p != rhs.p; }
 
 			NamedNode operator*() { return NamedNode(p->first, *p->second); }
 
@@ -186,8 +191,8 @@ namespace Jzon
 		void Add(const std::string &name, Value node);
 		void Remove(const std::string &name);
 
-		Iterator Begin();
-		Iterator End();
+		iterator begin();
+		iterator end();
 
 		Node &Get(const std::string &name, Node &default = Value()) const;
 
@@ -204,17 +209,17 @@ namespace Jzon
 	class Array : public Node
 	{
 	public:
-		class Iterator : public std::iterator<std::input_iterator_tag, NodePtr>
+		class iterator : public std::iterator<std::input_iterator_tag, NodePtr>
 		{
 		public:
-			Iterator(NodePtr *o) : p(o) {}
-			Iterator(const Iterator &it) : p(it.p) {}
+			iterator(NodePtr *o) : p(o) {}
+			iterator(const iterator &it) : p(it.p) {}
 
-			Iterator &operator++() { ++p; return *this; }
-			Iterator operator++(int) { Iterator tmp(*this); operator++(); return tmp; }
+			iterator &operator++() { ++p; return *this; }
+			iterator operator++(int) { iterator tmp(*this); operator++(); return tmp; }
 
-			bool operator==(const Iterator &rhs) { return p == rhs.p; }
-			bool operator!=(const Iterator &rhs) { return p != rhs.p; }
+			bool operator==(const iterator &rhs) { return p == rhs.p; }
+			bool operator!=(const iterator &rhs) { return p != rhs.p; }
 
 			Node &operator*() { return **p; }
 
@@ -233,8 +238,8 @@ namespace Jzon
 		void Add(Value node);
 		void Remove(unsigned int index);
 
-		Iterator Begin();
-		Iterator End();
+		iterator begin();
+		iterator end();
 
 		unsigned int GetCount() const;
 		Node &Get(unsigned int index, Node &default = Value()) const;

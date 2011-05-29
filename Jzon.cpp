@@ -219,10 +219,6 @@ namespace Jzon
 		return type;
 	}
 
-	bool Value::IsNull() const
-	{
-		return (type == VT_NULL);
-	}
 	std::string Value::AsString() const
 	{
 		if (IsNull())
@@ -236,7 +232,7 @@ namespace Jzon
 			return 0;
 		else
 		{
-			if (GetValueType() == VT_INT)
+			if (IsInt() || IsDouble())
 			{
 				std::stringstream sstr(valueStr);
 				int val;
@@ -253,7 +249,7 @@ namespace Jzon
 			return 0.0;
 		else
 		{
-			if (GetValueType() == VT_DOUBLE)
+			if (IsDouble() || IsInt())
 			{
 				std::stringstream sstr(valueStr);
 				double val;
@@ -269,7 +265,7 @@ namespace Jzon
 		if (IsNull())
 			return false;
 		else
-			if (GetValueType() == VT_BOOL)
+			if (IsBool())
 				return (valueStr == "true");
 			else
 				throw ValueException();
@@ -481,19 +477,19 @@ namespace Jzon
 		}
 	}
 
-	Object::Iterator Object::Begin()
+	Object::iterator Object::begin()
 	{
 		if (children.size() > 0)
-			return Object::Iterator(&children.front());
+			return Object::iterator(&children.front());
 		else
-			return Object::Iterator(NULL);
+			return Object::iterator(NULL);
 	}
-	Object::Iterator Object::End()
+	Object::iterator Object::end()
 	{
 		if (children.size() > 0)
-			return Object::Iterator(&children.back()+1);
+			return Object::iterator(&children.back()+1);
 		else
-			return Object::Iterator(NULL);
+			return Object::iterator(NULL);
 	}
 
 	Node &Object::Get(const std::string &name, Node &default) const
@@ -628,19 +624,19 @@ namespace Jzon
 			children.erase(children.begin()+index);
 	}
 
-	Array::Iterator Array::Begin()
+	Array::iterator Array::begin()
 	{
 		if (children.size() > 0)
-			return Array::Iterator(&children.front());
+			return Array::iterator(&children.front());
 		else
-			return Array::Iterator(NULL);
+			return Array::iterator(NULL);
 	}
-	Array::Iterator Array::End()
+	Array::iterator Array::end()
 	{
 		if (children.size() > 0)
-			return Array::Iterator(&children.back()+1);
+			return Array::iterator(&children.back()+1);
 		else
-			return Array::Iterator(NULL);
+			return Array::iterator(NULL);
 	}
 
 	unsigned int Array::GetCount() const
