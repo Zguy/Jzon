@@ -457,9 +457,9 @@ namespace Jzon
 	{
 		children.push_back(std::make_pair<std::string, NodePtr>(name, node.GetCopy()));
 	}
-	void Object::Add(const std::string &name, NodePtr node)
+	void Object::Add(const std::string &name, Value &node)
 	{
-		children.push_back(std::make_pair<std::string, NodePtr>(name, node->GetCopy()));
+		children.push_back(std::make_pair<std::string, NodePtr>(name, node.GetCopy()));
 	}
 	void Object::Add(const std::string &name, Value node)
 	{
@@ -502,6 +502,10 @@ namespace Jzon
 			}
 		}
 		return default;
+	}
+	Node &Object::Get(const std::string &name, Value default) const
+	{
+		return Get(name, static_cast<Node&>(default));
 	}
 
 	std::string Object::Write(const Format &format, unsigned int level) const
@@ -610,9 +614,9 @@ namespace Jzon
 	{
 		children.push_back(node.GetCopy());
 	}
-	void Array::Add(NodePtr node)
+	void Array::Add(Value &node)
 	{
-		children.push_back(node->GetCopy());
+		children.push_back(node.GetCopy());
 	}
 	void Array::Add(Value node)
 	{
@@ -649,6 +653,10 @@ namespace Jzon
 			return *children.at(index);
 		else
 			return default;
+	}
+	Node &Array::Get(unsigned int index, Value default) const
+	{
+		return Get(index, static_cast<Node&>(default));
 	}
 
 	std::string Array::Write(const Format &format, unsigned int level) const

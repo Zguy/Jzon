@@ -187,7 +187,7 @@ namespace Jzon
 		virtual Type GetType() const;
 
 		void Add(const std::string &name, Node &node);
-		void Add(const std::string &name, NodePtr node);
+		void Add(const std::string &name, Value &node);
 		void Add(const std::string &name, Value node);
 		void Remove(const std::string &name);
 
@@ -195,6 +195,7 @@ namespace Jzon
 		iterator end();
 
 		Node &Get(const std::string &name, Node &default = Value()) const;
+		Node &Get(const std::string &name, Value default) const;
 
 		virtual std::string Write(const Format &format = NoFormat, unsigned int level = 0) const;
 		static NodePtr Read(const std::string &json);
@@ -234,7 +235,7 @@ namespace Jzon
 		virtual Type GetType() const;
 
 		void Add(Node &node);
-		void Add(NodePtr node);
+		void Add(Value &node);
 		void Add(Value node);
 		void Remove(unsigned int index);
 
@@ -243,6 +244,7 @@ namespace Jzon
 
 		unsigned int GetCount() const;
 		Node &Get(unsigned int index, Node &default = Value()) const;
+		Node &Get(unsigned int index, Value default) const;
 
 		virtual std::string Write(const Format &format = NoFormat, unsigned int level = 0) const;
 		static NodePtr Read(const std::string &json);
