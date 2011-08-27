@@ -536,6 +536,10 @@ namespace Jzon
 			return Object::iterator(NULL);
 	}
 
+	unsigned int Object::GetCount() const
+	{
+		return children.size();
+	}
 	Node &Object::Get(const std::string &name, Node &default) const
 	{
 		for (ChildList::const_iterator it = children.cbegin(); it != children.cend(); ++it)
@@ -546,10 +550,6 @@ namespace Jzon
 			}
 		}
 		return default;
-	}
-	Node &Object::Get(const std::string &name, Value default) const
-	{
-		return Get(name, static_cast<Node&>(default));
 	}
 
 	std::string Object::Write(const Format &format, unsigned int level) const
@@ -708,10 +708,6 @@ namespace Jzon
 			return *children.at(index);
 		else
 			return default;
-	}
-	Node &Array::Get(unsigned int index, Value default) const
-	{
-		return Get(index, static_cast<Node&>(default));
 	}
 
 	std::string Array::Write(const Format &format, unsigned int level) const

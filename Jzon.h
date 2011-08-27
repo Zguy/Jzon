@@ -80,6 +80,10 @@ namespace Jzon
 
 		virtual Type GetType() const = 0;
 
+		inline bool IsObject() const { return (GetType() == T_OBJECT); }
+		inline bool IsArray() const { return (GetType() == T_ARRAY); }
+		inline bool IsValue() const { return (GetType() == T_VALUE); }
+
 		Object &AsObject();
 		const Object &AsObject() const;
 		Array &AsArray();
@@ -87,9 +91,20 @@ namespace Jzon
 		Value &AsValue();
 		const Value &AsValue() const;
 
-		inline bool IsObject() const { return (GetType() == T_OBJECT); }
-		inline bool IsArray() const { return (GetType() == T_ARRAY); }
-		inline bool IsValue() const { return (GetType() == T_VALUE); }
+		virtual inline bool IsNull() const { return false; }
+		virtual inline bool IsString() const { return false; }
+		virtual inline bool IsInt() const { return false; }
+		virtual inline bool IsDouble() const { return false; }
+		virtual inline bool IsBool() const { return false; }
+
+		virtual std::string AsString() const { throw TypeException(); }
+		virtual int AsInt() const { throw TypeException(); }
+		virtual double AsDouble() const { throw TypeException(); }
+		virtual bool AsBool() const { throw TypeException(); }
+
+		virtual unsigned int GetCount() const { return 0; }
+		virtual Node &Get(const std::string &name, Node &default) const { throw TypeException(); }
+		virtual Node &Get(unsigned int index, Node &default) const { throw TypeException(); }
 
 		virtual std::string Write(const Format &format = NoFormat, unsigned int level = 0) const = 0;
 		static NodePtr Read(const std::string &json);
@@ -122,16 +137,16 @@ namespace Jzon
 		virtual Type GetType() const;
 		ValueType GetValueType() const;
 
-		std::string AsString() const;
-		int AsInt() const;
-		double AsDouble() const;
-		bool AsBool() const;
+		virtual inline bool IsNull() const { return (type == VT_NULL); }
+		virtual inline bool IsString() const { return (type == VT_STRING); }
+		virtual inline bool IsInt() const { return (type == VT_INT); }
+		virtual inline bool IsDouble() const { return (type == VT_DOUBLE); }
+		virtual inline bool IsBool() const { return (type == VT_BOOL); }
 
-		inline bool IsNull() const { return (type == VT_NULL); }
-		inline bool IsString() const { return (type == VT_STRING); }
-		inline bool IsInt() const { return (type == VT_INT); }
-		inline bool IsDouble() const { return (type == VT_DOUBLE); }
-		inline bool IsBool() const { return (type == VT_BOOL); }
+		virtual std::string AsString() const;
+		virtual int AsInt() const;
+		virtual double AsDouble() const;
+		virtual bool AsBool() const;
 
 		void SetNull();
 		void Set(const Value &value);
@@ -200,8 +215,8 @@ namespace Jzon
 		iterator begin();
 		iterator end();
 
-		Node &Get(const std::string &name, Node &default = Value()) const;
-		Node &Get(const std::string &name, Value default) const;
+		virtual unsigned int GetCount() const;
+		virtual Node &Get(const std::string &name, Node &default = Value()) const;
 
 		virtual std::string Write(const Format &format = NoFormat, unsigned int level = 0) const;
 		static NodePtr Read(const std::string &json);
@@ -249,9 +264,8 @@ namespace Jzon
 		iterator begin();
 		iterator end();
 
-		unsigned int GetCount() const;
-		Node &Get(unsigned int index, Node &default = Value()) const;
-		Node &Get(unsigned int index, Value default) const;
+		virtual unsigned int GetCount() const;
+		virtual Node &Get(unsigned int index, Node &default = Value()) const;
 
 		virtual std::string Write(const Format &format = NoFormat, unsigned int level = 0) const;
 		static NodePtr Read(const std::string &json);
