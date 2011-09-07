@@ -25,34 +25,33 @@ THE SOFTWARE.
 #include <string>
 #include <vector>
 #include <utility>
-#include <memory>
 #include <iterator>
 #include <exception>
 
 namespace Jzon
 {
 	class Node;
-	typedef std::shared_ptr<Node> NodePtr;
-	typedef std::pair<std::string, NodePtr> NamedNodePtr;
-	typedef std::pair<std::string, Node&> NamedNode;
-	class Object;
-	typedef std::shared_ptr<Object> ObjectPtr;
-	class Array;
-	typedef std::shared_ptr<Array> ArrayPtr;
 	class Value;
-	typedef std::shared_ptr<Value> ValuePtr;
+	class Object;
+	class Array;
+	typedef std::pair<std::string, Node&> NamedNode;
+	typedef std::pair<std::string, Node*> NamedNodePtr;
 	
 	class TypeException : public std::exception
 	{
 	public:
-		TypeException() : std::exception("A Node was used as the wrong type")
-		{}
+		virtual const char *what() const throw()
+		{
+			return "A Node was used as the wrong type";
+		}
 	};
 	class ValueException : public std::exception
 	{
 	public:
-		ValueException() : std::exception("A Value was used as the wrong type")
-		{}
+		virtual const char *what() const throw()
+		{
+			return "A Value was used as the wrong type";
+		}
 	};
 
 	struct Format
@@ -67,6 +66,9 @@ namespace Jzon
 
 	class Node
 	{
+		friend class Object;
+		friend class Array;
+
 	public:
 		enum Type
 		{
@@ -107,9 +109,12 @@ namespace Jzon
 		virtual Node &Get(unsigned int index, Node &default) const { throw TypeException(); }
 
 		virtual std::string Write(const Format &format = NoFormat, unsigned int level = 0) const = 0;
-		static NodePtr Read(const std::string &json);
+		virtual void Read(const std::string &json) = 0;
 
-		virtual NodePtr GetCopy() const = 0;
+		static Type DetermineType(const std::string &json);
+
+	protected:
+		virtual Node *GetCopy() const = 0;
 	};
 
 	class Value : public Node
@@ -168,9 +173,10 @@ namespace Jzon
 		bool operator!=(const Value &other) const;
 
 		virtual std::string Write(const Format &format = NoFormat, unsigned int level = 0) const;
-		static NodePtr Read(const std::string &json);
+		virtual void Read(const std::string &json);
 
-		virtual NodePtr GetCopy() const;
+	protected:
+		virtual Node *GetCopy() const;
 
 	private:
 		std::string valueStr;
@@ -182,7 +188,7 @@ namespace Jzon
 	class Object : public Node
 	{
 	public:
-		class iterator : public std::iterator<std::input_iterator_tag, NamedNodePtr>
+		class iterator : public std::iterator<std::input_iterator_tag, NamedNode>
 		{
 		public:
 			iterator(NamedNodePtr *o) : p(o) {}
@@ -208,9 +214,9 @@ namespace Jzon
 		virtual Type GetType() const;
 
 		void Add(const std::string &name, Node &node);
-		void Add(const std::string &name, Value &node);
 		void Add(const std::string &name, Value node);
 		void Remove(const std::string &name);
+		void Clear();
 
 		iterator begin();
 		iterator end();
@@ -219,9 +225,10 @@ namespace Jzon
 		virtual Node &Get(const std::string &name, Node &default = Value()) const;
 
 		virtual std::string Write(const Format &format = NoFormat, unsigned int level = 0) const;
-		static NodePtr Read(const std::string &json);
+		virtual void Read(const std::string &json);
 
-		virtual NodePtr GetCopy() const;
+	protected:
+		virtual Node *GetCopy() const;
 
 	private:
 		typedef std::vector<NamedNodePtr> ChildList;
@@ -231,10 +238,10 @@ namespace Jzon
 	class Array : public Node
 	{
 	public:
-		class iterator : public std::iterator<std::input_iterator_tag, NodePtr>
+		class iterator : public std::iterator<std::input_iterator_tag, Node>
 		{
 		public:
-			iterator(NodePtr *o) : p(o) {}
+			iterator(Node **o) : p(o) {}
 			iterator(const iterator &it) : p(it.p) {}
 
 			iterator &operator++() { ++p; return *this; }
@@ -246,7 +253,7 @@ namespace Jzon
 			Node &operator*() { return **p; }
 
 		private:
-			NodePtr *p;
+			Node **p;
 		};
 
 		Array();
@@ -257,9 +264,9 @@ namespace Jzon
 		virtual Type GetType() const;
 
 		void Add(Node &node);
-		void Add(Value &node);
 		void Add(Value node);
 		void Remove(unsigned int index);
+		void Clear();
 
 		iterator begin();
 		iterator end();
@@ -268,12 +275,13 @@ namespace Jzon
 		virtual Node &Get(unsigned int index, Node &default = Value()) const;
 
 		virtual std::string Write(const Format &format = NoFormat, unsigned int level = 0) const;
-		static NodePtr Read(const std::string &json);
+		virtual void Read(const std::string &json);
 
-		virtual NodePtr GetCopy() const;
+	protected:
+		virtual Node *GetCopy() const;
 
 	private:
-		typedef std::vector<NodePtr> ChildList;
+		typedef std::vector<Node*> ChildList;
 		ChildList children;
 	};
 
@@ -284,24 +292,26 @@ namespace Jzon
 		~FileWriter();
 
 		static void WriteFile(const std::string &filename, Node &root, const Format &format = NoFormat);
-		static void WriteFile(const std::string &filename, NodePtr root, const Format &format = NoFormat);
 
 		void Write(const std::string &filename, Node &root, const Format &format = NoFormat);
-		void Write(const std::string &filename, NodePtr root, const Format &format = NoFormat);
 	};
 
 	class FileReader
 	{
 	public:
-		FileReader();
+		FileReader(const std::string &filename);
 		~FileReader();
 
-		static NodePtr ReadFile(const std::string &filename);
+		static void ReadFile(const std::string &filename, Node &node);
 
-		NodePtr Read(const std::string &filename);
+		void Read(Node &node);
+
+		Node::Type DetermineType();
 
 	private:
 		void RemoveWhitespace(std::string &json);
+
+		std::string json;
 	};
 }
 
