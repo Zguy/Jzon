@@ -355,7 +355,7 @@ namespace Jzon
 	}
 	void Value::Read(const std::string &json)
 	{
-		if (json.front() == '"' && json.back() == '"')
+		if (json.at(0) == '"' && json.at(json.size()-1) == '"')
 		{
 			valueStr = json.substr(1, json.size()-2);
 			type = VT_STRING;
@@ -370,7 +370,7 @@ namespace Jzon
 			bool onlyNumbers = true;
 			bool point = false;
 
-			for (std::string::const_iterator it = json.cbegin(); it != json.cend(); ++it)
+			for (std::string::const_iterator it = json.begin(); it != json.end(); ++it)
 			{
 				char c = (*it);
 
@@ -416,7 +416,7 @@ namespace Jzon
 	}
 	Object::Object(const Object &other)
 	{
-		for (ChildList::const_iterator it = other.children.cbegin(); it != other.children.cend(); ++it)
+		for (ChildList::const_iterator it = other.children.begin(); it != other.children.end(); ++it)
 		{
 			const std::string &name = (*it).first;
 			Node &value = *(*it).second;
@@ -428,7 +428,7 @@ namespace Jzon
 	{
 		const Object &object = other.AsObject();
 
-		for (ChildList::const_iterator it = object.children.cbegin(); it != object.children.cend(); ++it)
+		for (ChildList::const_iterator it = object.children.begin(); it != object.children.end(); ++it)
 		{
 			const std::string &name = (*it).first;
 			Node &value = *(*it).second;
@@ -494,16 +494,21 @@ namespace Jzon
 	{
 		return children.size();
 	}
-	Node &Object::Get(const std::string &name, Node &default) const
+	Node &Object::Get(const std::string &name) const
 	{
-		for (ChildList::const_iterator it = children.cbegin(); it != children.cend(); ++it)
+		Value value;
+		return Get(name, value);
+	}
+	Node &Object::Get(const std::string &name, Node &def) const
+	{
+		for (ChildList::const_iterator it = children.begin(); it != children.end(); ++it)
 		{
 			if ((*it).first == name)
 			{
 				return *(*it).second;
 			}
 		}
-		return default;
+		return def;
 	}
 
 	std::string Object::Write(const Format &format, unsigned int level) const
@@ -513,12 +518,12 @@ namespace Jzon
 		std::string json;
 		json += "{" + fi.GetNewline();
 
-		for (ChildList::const_iterator it = children.cbegin(); it != children.cend(); ++it)
+		for (ChildList::const_iterator it = children.begin(); it != children.end(); ++it)
 		{
 			const std::string &name = (*it).first;
 			Node &value = *(*it).second;
 
-			if (it != children.cbegin())
+			if (it != children.begin())
 				json += "," + fi.GetNewline();
 			json += fi.GetIndentation(level+1) + "\""+name+"\"" + ":" + fi.GetSpacing() + value.Write(format, level+1);
 		}
@@ -534,7 +539,7 @@ namespace Jzon
 		int numOpen = 0;
 		bool inString = false;
 
-		for (std::string::const_iterator it = json.cbegin(); it != json.cend(); ++it)
+		for (std::string::const_iterator it = json.begin(); it != json.end(); ++it)
 		{
 			const char &c = (*it);
 
@@ -597,7 +602,7 @@ namespace Jzon
 	}
 	Array::Array(const Array &other)
 	{
-		for (ChildList::const_iterator it = other.children.cbegin(); it != other.children.cend(); ++it)
+		for (ChildList::const_iterator it = other.children.begin(); it != other.children.end(); ++it)
 		{
 			const Node &value = *(*it);
 
@@ -608,7 +613,7 @@ namespace Jzon
 	{
 		const Array &array = other.AsArray();
 
-		for (ChildList::const_iterator it = array.children.cbegin(); it != array.children.cend(); ++it)
+		for (ChildList::const_iterator it = array.children.begin(); it != array.children.end(); ++it)
 		{
 			const Node &value = *(*it);
 
@@ -670,12 +675,17 @@ namespace Jzon
 	{
 		return children.size();
 	}
-	Node &Array::Get(unsigned int index, Node &default) const
+	Node &Array::Get(unsigned int index) const
+	{
+		Value value;
+		return Get(index, value);
+	}
+	Node &Array::Get(unsigned int index, Node &def) const
 	{
 		if (index < children.size())
 			return *children.at(index);
 		else
-			return default;
+			return def;
 	}
 
 	std::string Array::Write(const Format &format, unsigned int level) const
@@ -685,11 +695,11 @@ namespace Jzon
 		std::string json;
 		json += "[" + fi.GetNewline();
 
-		for (ChildList::const_iterator it = children.cbegin(); it != children.cend(); ++it)
+		for (ChildList::const_iterator it = children.begin(); it != children.end(); ++it)
 		{
 			Node &value = *(*it);
 
-			if (it != children.cbegin())
+			if (it != children.begin())
 				json += "," + fi.GetNewline();
 			json += fi.GetIndentation(level+1) + value.Write(format, level+1);
 		}
@@ -703,7 +713,7 @@ namespace Jzon
 		int numOpen = 0;
 		bool inString = false;
 
-		for (std::string::const_iterator it = json.cbegin(); it != json.cend(); ++it)
+		for (std::string::const_iterator it = json.begin(); it != json.end(); ++it)
 		{
 			const char &c = (*it);
 

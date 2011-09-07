@@ -105,8 +105,10 @@ namespace Jzon
 		virtual bool AsBool() const { throw TypeException(); }
 
 		virtual unsigned int GetCount() const { return 0; }
-		virtual Node &Get(const std::string &name, Node &default) const { throw TypeException(); }
-		virtual Node &Get(unsigned int index, Node &default) const { throw TypeException(); }
+		virtual Node &Get(const std::string &name) const { throw TypeException(); }
+		virtual Node &Get(const std::string &name, Node &def) const { throw TypeException(); }
+		virtual Node &Get(unsigned int index) const { throw TypeException(); }
+		virtual Node &Get(unsigned int index, Node &def) const { throw TypeException(); }
 
 		virtual std::string Write(const Format &format = NoFormat, unsigned int level = 0) const = 0;
 		virtual void Read(const std::string &json) = 0;
@@ -222,7 +224,8 @@ namespace Jzon
 		iterator end();
 
 		virtual unsigned int GetCount() const;
-		virtual Node &Get(const std::string &name, Node &default = Value()) const;
+		virtual Node &Get(const std::string &name) const;
+		virtual Node &Get(const std::string &name, Node &def) const;
 
 		virtual std::string Write(const Format &format = NoFormat, unsigned int level = 0) const;
 		virtual void Read(const std::string &json);
@@ -272,7 +275,8 @@ namespace Jzon
 		iterator end();
 
 		virtual unsigned int GetCount() const;
-		virtual Node &Get(unsigned int index, Node &default = Value()) const;
+		virtual Node &Get(unsigned int index) const;
+		virtual Node &Get(unsigned int index, Node &def) const;
 
 		virtual std::string Write(const Format &format = NoFormat, unsigned int level = 0) const;
 		virtual void Read(const std::string &json);
