@@ -413,7 +413,7 @@ namespace Jzon
 		if (type == VT_NULL)
 			value += "null";
 		else if (type == VT_STRING)
-			value += "\""+valueStr+"\"";
+			value += "\""+EscapeString()+"\"";
 		else
 			value += valueStr;
 		return value;
@@ -425,7 +425,7 @@ namespace Jzon
 
 		if (json.at(0) == '"' && json.at(json.size()-1) == '"')
 		{
-			valueStr = json.substr(1, json.size()-2);
+			valueStr = UnescapeString(json.substr(1, json.size()-2));
 			type = VT_STRING;
 		}
 		else if (json == "true" || json == "false")
@@ -476,6 +476,57 @@ namespace Jzon
 	Node *Value::GetCopy() const
 	{
 		return new Value(*this);
+	}
+
+	std::string Value::EscapeString() const
+	{
+		// This is not the most beautiful place for these, but it'll do
+		static const char charsToEscape[] = { '\"', '\\' };
+		static const unsigned int numChars = 2;
+
+		std::string escaped;
+
+		for (std::string::const_iterator it = valueStr.begin(); it != valueStr.end(); ++it)
+		{
+			const char &c = (*it);
+
+			for (unsigned int i = 0; i < numChars; ++i)
+			{
+				const char &e = charsToEscape[i];
+
+				if (c == e)
+				{
+					escaped += '\\';
+					break;
+				}
+			}
+			escaped += c;
+		}
+
+		return escaped;
+	}
+	std::string Value::UnescapeString(const std::string &value) const
+	{
+		std::string unescaped;
+
+		for (std::string::const_iterator it = value.begin(); it != value.end(); ++it)
+		{
+			const char &c = (*it);
+
+			if (c == '\\')
+			{
+				const char &c2 = *(it+1);
+
+				unescaped += c2;
+				++it;
+			}
+			else
+			{
+				unescaped += c;
+			}
+		}
+
+		return unescaped;
 	}
 
 

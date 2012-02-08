@@ -181,6 +181,9 @@ namespace Jzon
 		virtual Node *GetCopy() const;
 
 	private:
+		std::string EscapeString() const;
+		std::string UnescapeString(const std::string &value) const;
+
 		std::string valueStr;
 		ValueType type;
 	};
