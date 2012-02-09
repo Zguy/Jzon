@@ -313,8 +313,6 @@ namespace Jzon
 		Node::Type DetermineType();
 
 	private:
-		void RemoveWhitespace(std::string &json);
-
 		std::string json;
 	};
 }

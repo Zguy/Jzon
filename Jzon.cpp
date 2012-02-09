@@ -78,6 +78,68 @@ namespace Jzon
 		std::string spacing;
 	};
 
+	void RemoveWhitespace(const std::string &json, std::string &freshJson)
+	{
+		freshJson.clear();
+
+		bool comment = false;
+		int multicomment = 0;
+		bool inString = false;
+
+		for (std::string::const_iterator it = json.begin(); it != json.end(); ++it)
+		{
+			char c1 = (*it);
+			char c2;
+			if (it+1 != json.end())
+				c2 = (*(it+1));
+
+			if (c1 == '"')
+			{
+				inString = !inString;
+			}
+
+			if (!inString)
+			{
+				if (c1 == '/' && c2 == '*')
+				{
+					++multicomment;
+					++it;
+					continue;
+				}
+				else if (c1 == '*' && c2 == '/')
+				{
+					--multicomment;
+					++it;
+					continue;
+				}
+				else if (c1 == '/' && c2 == '/')
+				{
+					comment = true;
+					++it;
+					continue;
+				}
+				else if (c1 == '\n')
+				{
+					comment = false;
+				}
+			}
+
+			if (comment || multicomment > 0)
+				continue;
+
+			if (inString)
+			{
+				if (c1 != '\n')
+					freshJson += c1;
+			}
+			else
+			{
+				if ((c1 != '\n')&&(c1 != ' ')&&(c1 != '\t'))
+					freshJson += c1;
+			}
+		}
+	}
+
 	Node::Node()
 	{
 	}
@@ -128,8 +190,11 @@ namespace Jzon
 			throw TypeException();
 	}
 
-	Node::Type Node::DetermineType(const std::string &json)
+	Node::Type Node::DetermineType(const std::string &_json)
 	{
+		std::string json;
+		RemoveWhitespace(_json, json);
+
 		switch (json.at(0))
 		{
 		case '{' : return T_OBJECT; break;
@@ -353,8 +418,11 @@ namespace Jzon
 			value += valueStr;
 		return value;
 	}
-	void Value::Read(const std::string &json)
+	void Value::Read(const std::string &_json)
 	{
+		std::string json;
+		RemoveWhitespace(_json, json);
+
 		if (json.at(0) == '"' && json.at(json.size()-1) == '"')
 		{
 			valueStr = json.substr(1, json.size()-2);
@@ -531,8 +599,11 @@ namespace Jzon
 		json += fi.GetNewline() + fi.GetIndentation(level) + "}";
 		return json;
 	}
-	void Object::Read(const std::string &json)
+	void Object::Read(const std::string &_json)
 	{
+		std::string json;
+		RemoveWhitespace(_json, json);
+
 		std::string name;
 		std::string value;
 		bool atName = true;
@@ -707,8 +778,11 @@ namespace Jzon
 		json += fi.GetNewline() + fi.GetIndentation(level) + "]";
 		return json;
 	}
-	void Array::Read(const std::string &json)
+	void Array::Read(const std::string &_json)
 	{
+		std::string json;
+		RemoveWhitespace(_json, json);
+
 		std::string value;
 		int numOpen = 0;
 		bool inString = false;
@@ -787,16 +861,16 @@ namespace Jzon
 	{
 		std::fstream file(filename.c_str(), std::ios::in);
 
-		json = "";
+		std::string rawjson = "";
 
 		std::string line;
 		while (!file.eof())
 		{
 			std::getline(file, line);
-			json += line + '\n';
+			rawjson += line + '\n';
 		}
 
-		RemoveWhitespace(json);
+		RemoveWhitespace(rawjson, json);
 	}
 	FileReader::~FileReader()
 	{
@@ -823,69 +897,5 @@ namespace Jzon
 	Node::Type FileReader::DetermineType()
 	{
 		return Node::DetermineType(json);
-	}
-
-	void FileReader::RemoveWhitespace(std::string &json)
-	{
-		std::string freshJson;
-
-		bool comment = false;
-		int multicomment = 0;
-		bool inString = false;
-
-		for (std::string::iterator it = json.begin(); it != json.end(); ++it)
-		{
-			char c1 = (*it);
-			char c2;
-			if (it+1 != json.end())
-				c2 = (*(it+1));
-
-			if (c1 == '"')
-			{
-				inString = !inString;
-			}
-
-			if (!inString)
-			{
-				if (c1 == '/' && c2 == '*')
-				{
-					++multicomment;
-					++it;
-					continue;
-				}
-				else if (c1 == '*' && c2 == '/')
-				{
-					--multicomment;
-					++it;
-					continue;
-				}
-				else if (c1 == '/' && c2 == '/')
-				{
-					comment = true;
-					++it;
-					continue;
-				}
-				else if (c1 == '\n')
-				{
-					comment = false;
-				}
-			}
-
-			if (comment || multicomment > 0)
-				continue;
-
-			if (inString)
-			{
-				if (c1 != '\n')
-					freshJson += c1;
-			}
-			else
-			{
-				if ((c1 != '\n')&&(c1 != ' ')&&(c1 != '\t'))
-					freshJson += c1;
-			}
-		}
-
-		json = freshJson;
 	}
 }
