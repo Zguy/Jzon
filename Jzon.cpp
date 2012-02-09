@@ -88,12 +88,15 @@ namespace Jzon
 
 		for (std::string::const_iterator it = json.begin(); it != json.end(); ++it)
 		{
+			char c0 = '\0';
 			char c1 = (*it);
-			char c2;
+			char c2 = '\0';
+			if (it != json.begin())
+				c0 = (*(it-1));
 			if (it+1 != json.end())
 				c2 = (*(it+1));
 
-			if (c1 == '"')
+			if (c0 != '\\' && c1 == '"')
 			{
 				inString = !inString;
 			}
@@ -663,7 +666,13 @@ namespace Jzon
 
 		for (std::string::const_iterator it = json.begin(); it != json.end(); ++it)
 		{
+			char c0 = '\0';
 			const char &c = (*it);
+			char c2 = '\0';
+			if (it != json.begin())
+				c0 = (*(it-1));
+			if (it+1 != json.end())
+				c2 = (*(it+1));
 
 			if (c == '{' || c == '[')
 			{
@@ -673,7 +682,7 @@ namespace Jzon
 			{
 				--numOpen;
 			}
-			else if (c == '"')
+			else if (c0 != '\\' && c == '"')
 			{
 				inString = !inString;
 			}
@@ -840,7 +849,13 @@ namespace Jzon
 
 		for (std::string::const_iterator it = json.begin(); it != json.end(); ++it)
 		{
+			char c0 = '\0';
 			const char &c = (*it);
+			char c2 = '\0';
+			if (it != json.begin())
+				c0 = (*(it-1));
+			if (it+1 != json.end())
+				c2 = (*(it+1));
 
 			if (c == '{' || c == '[')
 			{
@@ -850,7 +865,7 @@ namespace Jzon
 			{
 				--numOpen;
 			}
-			else if (c == '"')
+			else if (c0 != '\\' && c == '"')
 			{
 				inString = !inString;
 			}
