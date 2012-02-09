@@ -481,28 +481,37 @@ namespace Jzon
 		return new Value(*this);
 	}
 
+	// This is not the most beautiful place for these, but it'll do
+	static const char charsToEscape[] = { '\"' };
+	static const unsigned int numCharsToEscape = 1;
+	bool shouldEscape(const char &c)
+	{
+		for (unsigned int i = 0; i < numCharsToEscape; ++i)
+		{
+			const char &e = charsToEscape[i];
+
+			if (c == e)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	std::string Value::EscapeString() const
 	{
-		// This is not the most beautiful place for these, but it'll do
-		static const char charsToEscape[] = { '\"', '\\' };
-		static const unsigned int numChars = 2;
-
 		std::string escaped;
 
 		for (std::string::const_iterator it = valueStr.begin(); it != valueStr.end(); ++it)
 		{
 			const char &c = (*it);
 
-			for (unsigned int i = 0; i < numChars; ++i)
+			if (shouldEscape(c))
 			{
-				const char &e = charsToEscape[i];
-
-				if (c == e)
-				{
-					escaped += '\\';
-					break;
-				}
+				escaped += '\\';
 			}
+
 			escaped += c;
 		}
 
@@ -515,11 +524,12 @@ namespace Jzon
 		for (std::string::const_iterator it = value.begin(); it != value.end(); ++it)
 		{
 			const char &c = (*it);
+			char c2 = '\0';
+			if (it+1 != value.end())
+				c2 = *(it+1);
 
-			if (c == '\\')
+			if (c == '\\' && shouldEscape(c2))
 			{
-				const char &c2 = *(it+1);
-
 				unescaped += c2;
 				++it;
 			}
