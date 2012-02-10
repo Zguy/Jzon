@@ -132,12 +132,11 @@ namespace Jzon
 
 			if (inString)
 			{
-				if (c1 != '\n')
-					freshJson += c1;
+				freshJson += c1;
 			}
 			else
 			{
-				if ((c1 != '\n')&&(c1 != ' ')&&(c1 != '\t'))
+				if ((c1 != '\n')&&(c1 != ' ')&&(c1 != '\t')&&(c1 != '\r')&&(c1 != '\f'))
 					freshJson += c1;
 			}
 		}
@@ -482,21 +481,38 @@ namespace Jzon
 	}
 
 	// This is not the most beautiful place for these, but it'll do
-	static const char charsToEscape[] = { '\\', '\"' };
-	static const unsigned int numCharsToEscape = 2;
-	bool shouldEscape(const char &c)
+	static const char charsUnescaped[] = { '\\'  , '\"'  , '\n' , '\t' , '\b' , '\f' , '\r' };
+	static const char *charsEscaped[]  = { "\\\\", "\\\"", "\\n", "\\t", "\\b", "\\f", "\\r" };
+	static const unsigned int numEscapeChars = 7;
+	static const char nullUnescaped = '\0';
+	static const char *nullEscaped  = "\0\0";
+	const char *&getEscaped(const char &c)
 	{
-		for (unsigned int i = 0; i < numCharsToEscape; ++i)
+		for (unsigned int i = 0; i < numEscapeChars; ++i)
 		{
-			const char &e = charsToEscape[i];
+			const char &ue = charsUnescaped[i];
 
-			if (c == e)
+			if (c == ue)
 			{
-				return true;
+				const char *&e = charsEscaped[i];
+				return e;
 			}
 		}
+		return nullEscaped;
+	}
+	const char &getUnescaped(const char &c1, const char &c2)
+	{
+		for (unsigned int i = 0; i < numEscapeChars; ++i)
+		{
+			const char *&e = charsEscaped[i];
 
-		return false;
+			if (c1 == e[0] && c2 == e[1])
+			{
+				const char &ue = charsUnescaped[i];
+				return ue;
+			}
+		}
+		return nullUnescaped;
 	}
 
 	std::string Value::EscapeString() const
@@ -507,12 +523,16 @@ namespace Jzon
 		{
 			const char &c = (*it);
 
-			if (shouldEscape(c))
+			const char *&a = getEscaped(c);
+			if (a[0] != '\0')
 			{
-				escaped += '\\';
+				escaped += a[0];
+				escaped += a[1];
 			}
-
-			escaped += c;
+			else
+			{
+				escaped += c;
+			}
 		}
 
 		return escaped;
@@ -528,12 +548,16 @@ namespace Jzon
 			if (it+1 != value.end())
 				c2 = *(it+1);
 
-			if (c == '\\' && shouldEscape(c2))
+			const char &a = getUnescaped(c, c2);
+			if (a != '\0')
 			{
-				continue;
+				unescaped += a;
+				++it;
 			}
-
-			unescaped += c;
+			else
+			{
+				unescaped += c;
+			}
 		}
 
 		return unescaped;
