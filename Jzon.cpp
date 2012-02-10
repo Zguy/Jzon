@@ -482,8 +482,8 @@ namespace Jzon
 	}
 
 	// This is not the most beautiful place for these, but it'll do
-	static const char charsToEscape[] = { '\"' };
-	static const unsigned int numCharsToEscape = 1;
+	static const char charsToEscape[] = { '\\', '\"' };
+	static const unsigned int numCharsToEscape = 2;
 	bool shouldEscape(const char &c)
 	{
 		for (unsigned int i = 0; i < numCharsToEscape; ++i)
@@ -530,13 +530,10 @@ namespace Jzon
 
 			if (c == '\\' && shouldEscape(c2))
 			{
-				unescaped += c2;
-				++it;
+				continue;
 			}
-			else
-			{
-				unescaped += c;
-			}
+
+			unescaped += c;
 		}
 
 		return unescaped;
@@ -684,11 +681,11 @@ namespace Jzon
 			if (it+1 != json.end())
 				c2 = (*(it+1));
 
-			if (c == '{' || c == '[')
+			if ((c == '{' || c == '[') && !inString)
 			{
 				++numOpen;
 			}
-			else if (c == '}' || c == ']')
+			else if ((c == '}' || c == ']') && !inString)
 			{
 				--numOpen;
 			}
@@ -867,11 +864,11 @@ namespace Jzon
 			if (it+1 != json.end())
 				c2 = (*(it+1));
 
-			if (c == '{' || c == '[')
+			if ((c == '{' || c == '[') && !inString)
 			{
 				++numOpen;
 			}
-			else if (c == '}' || c == ']')
+			else if ((c == '}' || c == ']') && !inString)
 			{
 				--numOpen;
 			}
