@@ -108,19 +108,22 @@ namespace Jzon
 				if (c1 == '/' && c2 == '*')
 				{
 					++multicomment;
-					++it;
+					if (it+1 != json.end())
+						++it;
 					continue;
 				}
 				else if (c1 == '*' && c2 == '/')
 				{
 					--multicomment;
-					++it;
+					if (it+1 != json.end())
+						++it;
 					continue;
 				}
 				else if (c1 == '/' && c2 == '/')
 				{
 					comment = true;
-					++it;
+					if (it+1 != json.end())
+						++it;
 					continue;
 				}
 				else if (c1 == '\n')
@@ -557,7 +560,8 @@ namespace Jzon
 			if (a != '\0')
 			{
 				unescaped += a;
-				++it;
+				if (it+1 != value.end())
+					++it;
 			}
 			else
 			{
@@ -635,14 +639,14 @@ namespace Jzon
 
 	Object::iterator Object::begin()
 	{
-		if (children.size() > 0)
+		if (!children.empty())
 			return Object::iterator(&children.front());
 		else
 			return Object::iterator(NULL);
 	}
 	Object::iterator Object::end()
 	{
-		if (children.size() > 0)
+		if (!children.empty())
 			return Object::iterator(&children.back()+1);
 		else
 			return Object::iterator(NULL);
@@ -704,11 +708,8 @@ namespace Jzon
 		{
 			char c0 = '\0';
 			const char &c = (*it);
-			char c2 = '\0';
 			if (it != json.begin())
 				c0 = (*(it-1));
-			if (it+1 != json.end())
-				c2 = (*(it+1));
 
 			if ((c == '{' || c == '[') && !inString)
 			{
@@ -825,14 +826,14 @@ namespace Jzon
 
 	Array::iterator Array::begin()
 	{
-		if (children.size() > 0)
+		if (!children.empty())
 			return Array::iterator(&children.front());
 		else
 			return Array::iterator(NULL);
 	}
 	Array::iterator Array::end()
 	{
-		if (children.size() > 0)
+		if (!children.empty())
 			return Array::iterator(&children.back()+1);
 		else
 			return Array::iterator(NULL);
@@ -887,11 +888,8 @@ namespace Jzon
 		{
 			char c0 = '\0';
 			const char &c = (*it);
-			char c2 = '\0';
 			if (it != json.begin())
 				c0 = (*(it-1));
-			if (it+1 != json.end())
-				c2 = (*(it+1));
 
 			if ((c == '{' || c == '[') && !inString)
 			{
