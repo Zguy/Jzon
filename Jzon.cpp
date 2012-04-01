@@ -644,6 +644,13 @@ namespace Jzon
 		else
 			return Object::iterator(NULL);
 	}
+	Object::const_iterator Object::begin() const
+	{
+		if (!children.empty())
+			return Object::const_iterator(&children.front());
+		else
+			return Object::const_iterator(NULL);
+	}
 	Object::iterator Object::end()
 	{
 		if (!children.empty())
@@ -651,8 +658,15 @@ namespace Jzon
 		else
 			return Object::iterator(NULL);
 	}
+	Object::const_iterator Object::end() const
+	{
+		if (!children.empty())
+			return Object::const_iterator(&children.back()+1);
+		else
+			return Object::const_iterator(NULL);
+	}
 
-	unsigned int Object::GetCount() const
+	size_t Object::GetCount() const
 	{
 		return children.size();
 	}
@@ -806,7 +820,7 @@ namespace Jzon
 	{
 		children.push_back(new Value(node));
 	}
-	void Array::Remove(unsigned int index)
+	void Array::Remove(size_t index)
 	{
 		if (index < children.size())
 		{
@@ -831,6 +845,13 @@ namespace Jzon
 		else
 			return Array::iterator(NULL);
 	}
+	Array::const_iterator Array::begin() const
+	{
+		if (!children.empty())
+			return Array::const_iterator(&children.front());
+		else
+			return Array::const_iterator(NULL);
+	}
 	Array::iterator Array::end()
 	{
 		if (!children.empty())
@@ -838,17 +859,24 @@ namespace Jzon
 		else
 			return Array::iterator(NULL);
 	}
+	Array::const_iterator Array::end() const
+	{
+		if (!children.empty())
+			return Array::const_iterator(&children.back()+1);
+		else
+			return Array::const_iterator(NULL);
+	}
 
-	unsigned int Array::GetCount() const
+	size_t Array::GetCount() const
 	{
 		return children.size();
 	}
-	Node &Array::Get(unsigned int index) const
+	Node &Array::Get(size_t index) const
 	{
 		Value value;
 		return Get(index, value);
 	}
-	Node &Array::Get(unsigned int index, Node &def) const
+	Node &Array::Get(size_t index, Node &def) const
 	{
 		if (index < children.size())
 			return *children.at(index);

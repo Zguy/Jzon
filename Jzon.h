@@ -104,11 +104,11 @@ namespace Jzon
 		virtual double AsDouble() const { throw TypeException(); }
 		virtual bool AsBool() const { throw TypeException(); }
 
-		virtual unsigned int GetCount() const { return 0; }
+		virtual size_t GetCount() const { return 0; }
 		virtual Node &Get(const std::string &name) const { throw TypeException(); }
 		virtual Node &Get(const std::string &name, Node &def) const { throw TypeException(); }
-		virtual Node &Get(unsigned int index) const { throw TypeException(); }
-		virtual Node &Get(unsigned int index, Node &def) const { throw TypeException(); }
+		virtual Node &Get(size_t index) const { throw TypeException(); }
+		virtual Node &Get(size_t index, Node &def) const { throw TypeException(); }
 
 		virtual std::string Write(const Format &format = NoFormat, unsigned int level = 0) const = 0;
 		virtual void Read(const std::string &json) = 0;
@@ -210,6 +210,23 @@ namespace Jzon
 		private:
 			NamedNodePtr *p;
 		};
+		class const_iterator : public std::iterator<std::input_iterator_tag, const NamedNode>
+		{
+		public:
+			const_iterator(const NamedNodePtr *o) : p(o) {}
+			const_iterator(const const_iterator &it) : p(it.p) {}
+
+			const_iterator &operator++() { ++p; return *this; }
+			const_iterator operator++(int) { const_iterator tmp(*this); operator++(); return tmp; }
+
+			bool operator==(const const_iterator &rhs) { return p == rhs.p; }
+			bool operator!=(const const_iterator &rhs) { return p != rhs.p; }
+
+			const NamedNode operator*() { return NamedNode(p->first, *p->second); }
+
+		private:
+			const NamedNodePtr *p;
+		};
 
 		Object();
 		Object(const Object &other);
@@ -224,9 +241,11 @@ namespace Jzon
 		void Clear();
 
 		iterator begin();
+		const_iterator begin() const;
 		iterator end();
+		const_iterator end() const;
 
-		virtual unsigned int GetCount() const;
+		virtual size_t GetCount() const;
 		virtual Node &Get(const std::string &name) const;
 		virtual Node &Get(const std::string &name, Node &def) const;
 
@@ -261,6 +280,23 @@ namespace Jzon
 		private:
 			Node **p;
 		};
+		class const_iterator : public std::iterator<std::input_iterator_tag, const Node>
+		{
+		public:
+			const_iterator(const Node *const *o) : p(o) {}
+			const_iterator(const const_iterator &it) : p(it.p) {}
+
+			const_iterator &operator++() { ++p; return *this; }
+			const_iterator operator++(int) { const_iterator tmp(*this); operator++(); return tmp; }
+
+			bool operator==(const const_iterator &rhs) { return p == rhs.p; }
+			bool operator!=(const const_iterator &rhs) { return p != rhs.p; }
+
+			const Node &operator*() { return **p; }
+
+		private:
+			const Node *const *p;
+		};
 
 		Array();
 		Array(const Array &other);
@@ -271,15 +307,17 @@ namespace Jzon
 
 		void Add(Node &node);
 		void Add(Value node);
-		void Remove(unsigned int index);
+		void Remove(size_t index);
 		void Clear();
 
 		iterator begin();
+		const_iterator begin() const;
 		iterator end();
+		const_iterator end() const;
 
-		virtual unsigned int GetCount() const;
-		virtual Node &Get(unsigned int index) const;
-		virtual Node &Get(unsigned int index, Node &def) const;
+		virtual size_t GetCount() const;
+		virtual Node &Get(size_t index) const;
+		virtual Node &Get(size_t index, Node &def) const;
 
 		virtual std::string Write(const Format &format = NoFormat, unsigned int level = 0) const;
 		virtual void Read(const std::string &json);
