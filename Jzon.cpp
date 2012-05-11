@@ -1132,6 +1132,12 @@ namespace Jzon
 				valueBuffer.clear();
 			}
 
+			// Push the token last so that any
+			// value token will get pushed first
+			// from above.
+			// If saveBuffer is false, it means that
+			// we are in the middle of a value, so we
+			// don't want to push any tokens now.
 			if (saveBuffer)
 			{
 				tokens.push(token);
