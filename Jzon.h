@@ -24,6 +24,7 @@ THE SOFTWARE.
 
 #include <string>
 #include <vector>
+#include <queue>
 #include <utility>
 #include <iterator>
 #include <exception>
@@ -134,6 +135,7 @@ namespace Jzon
 		Value();
 		Value(const Value &rhs);
 		Value(const Node &rhs);
+		Value(ValueType type, const std::string &value);
 		Value(const std::string &value);
 		Value(const char *value);
 		Value(const int value);
@@ -157,6 +159,7 @@ namespace Jzon
 
 		void SetNull();
 		void Set(const Value &value);
+		void Set(ValueType type, const std::string &value);
 		void Set(const std::string &value);
 		void Set(const char *value);
 		void Set(const int value);
@@ -355,6 +358,50 @@ namespace Jzon
 
 	private:
 		std::string json;
+	};
+
+	class Parser
+	{
+	public:
+		Parser();
+		Parser(const std::string &json);
+		~Parser();
+
+		void SetJson(const std::string &json);
+		bool Parse();
+
+		const std::string &GetError() const;
+
+	private:
+		enum Token
+		{
+			T_UNKNOWN,
+			T_OBJ_BEGIN,
+			T_OBJ_END,
+			T_ARRAY_BEGIN,
+			T_ARRAY_END,
+			T_SEPARATOR_NODE,
+			T_SEPARATOR_NAME,
+			T_VALUE
+		};
+
+		void tokenize();
+		bool assemble();
+
+		void readString();
+
+		bool interpretValue(const std::string &value);
+
+		bool isNumber(char c) const;
+
+		std::string json;
+
+		std::queue<Token> tokens;
+		std::queue<std::pair<Value::ValueType, std::string> > data;
+
+		unsigned int cursor;
+
+		std::string error;
 	};
 }
 

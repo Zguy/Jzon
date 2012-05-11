@@ -24,6 +24,8 @@ THE SOFTWARE.
 #include <sstream>
 #include <fstream>
 
+#include <stack>
+
 namespace Jzon
 {
 	class FormatInterpreter
@@ -229,6 +231,10 @@ namespace Jzon
 		valueStr = value.valueStr;
 		type = value.type;
 	}
+	Value::Value(ValueType type, const std::string &value)
+		: valueStr(value), type(type)
+	{
+	}
 	Value::Value(const std::string &value)
 		: valueStr(value), type(VT_STRING)
 	{
@@ -327,39 +333,44 @@ namespace Jzon
 	void Value::SetNull()
 	{
 		valueStr = "";
-		type = VT_NULL;
+		type     = VT_NULL;
 	}
 	void Value::Set(const Value &value)
 	{
 		if (this != &value)
 		{
 			valueStr = value.valueStr;
-			type = value.type;
+			type     = value.type;
 		}
+	}
+	void Value::Set(ValueType type, const std::string &value)
+	{
+		valueStr = value;
+		type     = type;
 	}
 	void Value::Set(const std::string &value)
 	{
 		valueStr = value;
-		type = VT_STRING;
+		type     = VT_STRING;
 	}
 	void Value::Set(const char *value)
 	{
 		valueStr = std::string(value);
-		type = VT_STRING;
+		type     = VT_STRING;
 	}
 	void Value::Set(const int value)
 	{
 		std::stringstream sstr;
 		sstr << value;
 		valueStr = sstr.str();
-		type = VT_INT;
+		type     = VT_INT;
 	}
 	void Value::Set(const double value)
 	{
 		std::stringstream sstr;
 		sstr << value;
 		valueStr = sstr.str();
-		type = VT_DOUBLE;
+		type     = VT_DOUBLE;
 	}
 	void Value::Set(const bool value)
 	{
@@ -1025,5 +1036,265 @@ namespace Jzon
 	Node::Type FileReader::DetermineType()
 	{
 		return Node::DetermineType(json);
+	}
+
+
+	Parser::Parser()
+	{
+	}
+	Parser::Parser(const std::string &json)
+	{
+		SetJson(json);
+	}
+	Parser::~Parser()
+	{
+	}
+
+	void Parser::SetJson(const std::string &json)
+	{
+		RemoveWhitespace(json, this->json);
+	}
+	bool Parser::Parse()
+	{
+		cursor = 0;
+
+		tokenize();
+		bool success = assemble();
+
+		return success;
+	}
+
+	const std::string &Parser::GetError() const
+	{
+		return error;
+	}
+
+	void Parser::tokenize()
+	{
+		Token token;
+		std::string valueBuffer;
+		bool saveBuffer;
+
+		for (; cursor < json.size(); ++cursor)
+		{
+			char c = json.at(cursor);
+
+			saveBuffer = true;
+
+			if (c == '{')
+			{
+				token = T_OBJ_BEGIN;
+			}
+			else if (c == '}')
+			{
+				token = T_OBJ_END;
+			}
+			else if (c == '[')
+			{
+				token = T_ARRAY_BEGIN;
+			}
+			else if (c == ']')
+			{
+				token = T_ARRAY_END;
+			}
+			else if (c == ',')
+			{
+				token = T_SEPARATOR_NODE;
+			}
+			else if (c == ':')
+			{
+				token = T_SEPARATOR_NAME;
+			}
+			else if (c == '"')
+			{
+				token = T_VALUE;
+				readString();
+			}
+			else
+			{
+				valueBuffer += c;
+				saveBuffer = false;
+			}
+
+			if ((saveBuffer || cursor == json.size()-1) && (!valueBuffer.empty())) // Always save buffer on the last character
+			{
+				if (interpretValue(valueBuffer))
+				{
+					tokens.push(T_VALUE);
+				}
+				else
+				{
+					// Store the unknown token, so we can show it to the user
+					data.push(std::make_pair(Value::VT_STRING, valueBuffer));
+					tokens.push(T_UNKNOWN);
+				}
+
+				valueBuffer.clear();
+			}
+
+			if (saveBuffer)
+			{
+				tokens.push(token);
+			}
+		}
+	}
+	bool Parser::assemble()
+	{
+		std::stack<Node*> nodeStack;
+
+		std::string name;
+		bool isName = true;
+
+		Token token;
+		while (!tokens.empty())
+		{
+			token = tokens.front();
+			tokens.pop();
+
+			if (token == T_UNKNOWN)
+			{
+				const std::string &unknownToken = data.front().second;
+				error = "Unknown token: "+unknownToken;
+				data.pop();
+				return false;
+			}
+			else if (token == T_OBJ_BEGIN)
+			{
+				Node *node = new Object;
+				if (!nodeStack.empty())
+				{
+					if (nodeStack.top()->IsObject())
+						nodeStack.top()->AsObject().Add(name, *node);
+					else if (nodeStack.top()->IsArray())
+						nodeStack.top()->AsArray().Add(*node);
+				}
+
+				nodeStack.push(node);
+			}
+			else if (token == T_ARRAY_BEGIN)
+			{
+				Node *node = new Array;
+				if (!nodeStack.empty())
+				{
+					if (nodeStack.top()->IsObject())
+						nodeStack.top()->AsObject().Add(name, *node);
+					else if (nodeStack.top()->IsArray())
+						nodeStack.top()->AsArray().Add(*node);
+				}
+
+				nodeStack.push(node);
+			}
+			else if (token == T_OBJ_END || token == T_ARRAY_END)
+			{
+				nodeStack.pop();
+			}
+			else if (token == T_SEPARATOR_NAME)
+			{
+				if (data.front().first != Value::VT_STRING)
+				{
+					error = "A name has to be a string";
+					return false;
+				}
+				else
+				{
+					name = data.front().second;
+					data.pop();
+				}
+			}
+			else if (token == T_SEPARATOR_NODE)
+			{
+				Node *node = new Value(data.front().first, data.front().second);
+				data.pop();
+				if (!nodeStack.empty())
+				{
+					if (nodeStack.top()->IsObject())
+						nodeStack.top()->AsObject().Add(name, *node);
+					else if (nodeStack.top()->IsArray())
+						nodeStack.top()->AsArray().Add(*node);
+				}
+				else
+				{
+					nodeStack.push(node);
+				}
+			}
+		}
+
+		return true;
+	}
+
+	void Parser::readString()
+	{
+		if (json.at(cursor) != '"')
+			return;
+
+		std::string str;
+
+		++cursor;
+
+		for (; cursor < json.size(); ++cursor)
+		{
+			char c1 = '\0';
+			char c2 = json.at(cursor);
+
+			if (cursor > 0)
+				c1 = json.at(cursor-1);
+
+			if (c1 != '\\' && c2 == '"')
+			{
+				break;
+			}
+
+			str += c2;
+		}
+
+		data.push(std::make_pair(Value::VT_STRING, str));
+	}
+
+	bool Parser::interpretValue(const std::string &value)
+	{
+		std::string upperValue(value.size(), ' ');
+
+		std::transform(value.begin(), value.end(), upperValue.begin(), toupper);
+
+		if (upperValue == "NULL")
+		{
+			data.push(std::make_pair(Value::VT_NULL, ""));
+		}
+		else if (upperValue == "TRUE")
+		{
+			data.push(std::make_pair(Value::VT_BOOL, "true"));
+		}
+		else if (upperValue == "FALSE")
+		{
+			data.push(std::make_pair(Value::VT_BOOL, "false"));
+		}
+		else
+		{
+			bool number = true;
+			for (std::string::const_iterator it = value.begin(); it != value.end(); ++it)
+			{
+				if (!isNumber(*it))
+				{
+					number = false;
+					break;
+				}
+			}
+
+			if (number)
+			{
+				data.push(std::make_pair(Value::VT_DOUBLE, value));
+			}
+			else
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	bool Parser::isNumber(char c) const
+	{
+		return ((c >= '0' && c <= '9') || c == '.' || c == '-');
 	}
 }
