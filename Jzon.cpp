@@ -236,11 +236,11 @@ namespace Jzon
 	{
 	}
 	Value::Value(const std::string &value)
-		: valueStr(value), type(VT_STRING)
+		: valueStr(UnescapeString(value)), type(VT_STRING)
 	{
 	}
 	Value::Value(const char *value)
-		: valueStr(std::string(value)), type(VT_STRING)
+		: valueStr(UnescapeString(std::string(value))), type(VT_STRING)
 	{
 	}
 	Value::Value(const int value)
@@ -350,12 +350,12 @@ namespace Jzon
 	}
 	void Value::Set(const std::string &value)
 	{
-		valueStr = value;
+		valueStr = UnescapeString(value);
 		type     = VT_STRING;
 	}
 	void Value::Set(const char *value)
 	{
-		valueStr = std::string(value);
+		valueStr = UnescapeString(std::string(value));
 		type     = VT_STRING;
 	}
 	void Value::Set(const int value)
@@ -1146,6 +1146,7 @@ namespace Jzon
 	}
 	bool Parser::assemble()
 	{
+		Node *root = NULL;
 		std::stack<Node*> nodeStack;
 
 		std::string name;
@@ -1192,35 +1193,51 @@ namespace Jzon
 			}
 			else if (token == T_OBJ_END || token == T_ARRAY_END)
 			{
+				if (nodeStack.size() == 1)
+				{
+					root = nodeStack.top();
+				}
 				nodeStack.pop();
 			}
-			else if (token == T_SEPARATOR_NAME)
+			else if (token == T_VALUE)
 			{
-				if (data.front().first != Value::VT_STRING)
+				if (tokens.front() == T_SEPARATOR_NAME)
 				{
-					error = "A name has to be a string";
-					return false;
+					tokens.pop();
+					if (data.front().first != Value::VT_STRING)
+					{
+						error = "A name has to be a string";
+						return false;
+					}
+					else
+					{
+						name = data.front().second;
+						data.pop();
+					}
 				}
 				else
 				{
-					name = data.front().second;
+					Node *node;
+					if (data.front().first == Value::VT_STRING)
+					{
+						node = new Value(data.front().second); // This constructor calls UnescapeString()
+					}
+					else
+					{
+						node = new Value(data.front().first, data.front().second);
+					}
 					data.pop();
-				}
-			}
-			else if (token == T_SEPARATOR_NODE)
-			{
-				Node *node = new Value(data.front().first, data.front().second);
-				data.pop();
-				if (!nodeStack.empty())
-				{
-					if (nodeStack.top()->IsObject())
-						nodeStack.top()->AsObject().Add(name, *node);
-					else if (nodeStack.top()->IsArray())
-						nodeStack.top()->AsArray().Add(*node);
-				}
-				else
-				{
-					nodeStack.push(node);
+					if (!nodeStack.empty())
+					{
+						if (nodeStack.top()->IsObject())
+							nodeStack.top()->AsObject().Add(name, *node);
+						else if (nodeStack.top()->IsArray())
+							nodeStack.top()->AsArray().Add(*node);
+					}
+					else
+					{
+						nodeStack.push(node);
+					}
 				}
 			}
 		}
