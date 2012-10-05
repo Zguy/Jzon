@@ -215,49 +215,41 @@ namespace Jzon
 
 
 	Value::Value()
-		: valueStr(""), type(VT_NULL)
 	{
+		SetNull();
 	}
 	Value::Value(const Value &rhs)
 	{
-		valueStr = rhs.valueStr;
-		type = rhs.type;
+		Set(rhs);
 	}
 	Value::Value(const Node &rhs)
 	{
 		const Value &value = rhs.AsValue();
-		valueStr = value.valueStr;
-		type = value.type;
+		Set(value);
 	}
 	Value::Value(const std::string &value)
-		: valueStr(value), type(VT_STRING)
 	{
+		Set(value);
 	}
 	Value::Value(const char *value)
-		: valueStr(std::string(value)), type(VT_STRING)
 	{
+		Set(value);
 	}
 	Value::Value(const int value)
-		: type(VT_INT)
 	{
-		std::stringstream sstr;
-		sstr << value;
-		valueStr = sstr.str();
+		Set(value);
+	}
+	Value::Value(const float value)
+	{
+		Set(value);
 	}
 	Value::Value(const double value)
-		: type(VT_DOUBLE)
 	{
-		std::stringstream sstr;
-		sstr << value;
-		valueStr = sstr.str();
+		Set(value);
 	}
 	Value::Value(const bool value)
-		: type(VT_BOOL)
 	{
-		if (value)
-			valueStr = "true";
-		else
-			valueStr = "false";
+		Set(value);
 	}
 	Value::~Value()
 	{
@@ -272,20 +264,20 @@ namespace Jzon
 		return type;
 	}
 
-	std::string Value::AsString() const
+	std::string Value::ToString() const
 	{
 		if (IsNull())
 			return "null";
 		else
 			return valueStr;
 	}
-	int Value::AsInt() const
+	int Value::ToInt() const
 	{
 		if (IsNull())
 			return 0;
 		else
 		{
-			if (IsInt() || IsDouble())
+			if (IsNumber())
 			{
 				std::stringstream sstr(valueStr);
 				int val;
@@ -296,13 +288,30 @@ namespace Jzon
 				throw ValueException();
 		}
 	}
-	double Value::AsDouble() const
+	float Value::ToFloat() const
 	{
 		if (IsNull())
 			return 0.0;
 		else
 		{
-			if (IsDouble() || IsInt())
+			if (IsNumber())
+			{
+				std::stringstream sstr(valueStr);
+				float val;
+				sstr >> val;
+				return val;
+			}
+			else
+				throw ValueException();
+		}
+	}
+	double Value::ToDouble() const
+	{
+		if (IsNull())
+			return 0.0;
+		else
+		{
+			if (IsNumber())
 			{
 				std::stringstream sstr(valueStr);
 				double val;
@@ -313,7 +322,7 @@ namespace Jzon
 				throw ValueException();
 		}
 	}
-	bool Value::AsBool() const
+	bool Value::ToBool() const
 	{
 		if (IsNull())
 			return false;
@@ -352,14 +361,21 @@ namespace Jzon
 		std::stringstream sstr;
 		sstr << value;
 		valueStr = sstr.str();
-		type = VT_INT;
+		type = VT_NUMBER;
+	}
+	void Value::Set(const float value)
+	{
+		std::stringstream sstr;
+		sstr << value;
+		valueStr = sstr.str();
+		type = VT_NUMBER;
 	}
 	void Value::Set(const double value)
 	{
 		std::stringstream sstr;
 		sstr << value;
 		valueStr = sstr.str();
-		type = VT_DOUBLE;
+		type = VT_NUMBER;
 	}
 	void Value::Set(const bool value)
 	{
@@ -393,6 +409,11 @@ namespace Jzon
 		return *this;
 	}
 	Value &Value::operator=(const int rhs)
+	{
+		Set(rhs);
+		return *this;
+	}
+	Value &Value::operator=(const float rhs)
 	{
 		Set(rhs);
 		return *this;
@@ -446,7 +467,6 @@ namespace Jzon
 		else
 		{
 			bool onlyNumbers = true;
-			bool point = false;
 
 			for (std::string::const_iterator it = json.begin(); it != json.end(); ++it)
 			{
@@ -456,24 +476,12 @@ namespace Jzon
 				{
 					onlyNumbers = false;
 				}
-				else if (c == '.')
-				{
-					point = true;
-				}
 			}
 
 			if (onlyNumbers)
 			{
-				if (point)
-				{
-					valueStr = json;
-					type = VT_DOUBLE;
-				}
-				else
-				{
-					valueStr = json;
-					type = VT_INT;
-				}
+				valueStr = json;
+				type = VT_NUMBER;
 			}
 			else
 			{
