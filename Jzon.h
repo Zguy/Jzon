@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2011 Johannes Häggqvist
+Copyright (c) 2011 Johannes HÃ¤ggqvist
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -96,14 +96,14 @@ namespace Jzon
 
 		virtual inline bool IsNull() const { return false; }
 		virtual inline bool IsString() const { return false; }
-		virtual inline bool IsInt() const { return false; }
-		virtual inline bool IsDouble() const { return false; }
+		virtual inline bool IsNumber() const { return false; }
 		virtual inline bool IsBool() const { return false; }
 
-		virtual std::string AsString() const { throw TypeException(); }
-		virtual int AsInt() const { throw TypeException(); }
-		virtual double AsDouble() const { throw TypeException(); }
-		virtual bool AsBool() const { throw TypeException(); }
+		virtual std::string ToString() const { throw TypeException(); }
+		virtual int ToInt() const { throw TypeException(); }
+		virtual float ToFloat() const { throw TypeException(); }
+		virtual double ToDouble() const { throw TypeException(); }
+		virtual bool ToBool() const { throw TypeException(); }
 
 		virtual size_t GetCount() const { return 0; }
 		virtual Node &Get(const std::string &name) const { throw TypeException(); }
@@ -127,8 +127,7 @@ namespace Jzon
 		{
 			VT_NULL,
 			VT_STRING,
-			VT_INT,
-			VT_DOUBLE,
+			VT_NUMBER,
 			VT_BOOL
 		};
 
@@ -139,6 +138,7 @@ namespace Jzon
 		Value(const std::string &value);
 		Value(const char *value);
 		Value(const int value);
+		Value(const float value);
 		Value(const double value);
 		Value(const bool value);
 		virtual ~Value();
@@ -148,14 +148,14 @@ namespace Jzon
 
 		virtual inline bool IsNull() const { return (type == VT_NULL); }
 		virtual inline bool IsString() const { return (type == VT_STRING); }
-		virtual inline bool IsInt() const { return (type == VT_INT); }
-		virtual inline bool IsDouble() const { return (type == VT_DOUBLE); }
+		virtual inline bool IsNumber() const { return (type == VT_NUMBER); }
 		virtual inline bool IsBool() const { return (type == VT_BOOL); }
 
-		virtual std::string AsString() const;
-		virtual int AsInt() const;
-		virtual double AsDouble() const;
-		virtual bool AsBool() const;
+		virtual std::string ToString() const;
+		virtual int ToInt() const;
+		virtual float ToFloat() const;
+		virtual double ToDouble() const;
+		virtual bool ToBool() const;
 
 		void SetNull();
 		void Set(const Value &value);
@@ -163,6 +163,7 @@ namespace Jzon
 		void Set(const std::string &value);
 		void Set(const char *value);
 		void Set(const int value);
+		void Set(const float value);
 		void Set(const double value);
 		void Set(const bool value);
 
@@ -171,6 +172,7 @@ namespace Jzon
 		Value &operator=(const std::string &rhs);
 		Value &operator=(const char *rhs);
 		Value &operator=(const int rhs);
+		Value &operator=(const float rhs);
 		Value &operator=(const double rhs);
 		Value &operator=(const bool rhs);
 
