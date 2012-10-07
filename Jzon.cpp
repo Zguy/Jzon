@@ -230,8 +230,8 @@ namespace Jzon
 		Set(value);
 	}
 	Value::Value(ValueType type, const std::string &value)
-		: valueStr(value), type(type)
 	{
+		Set(type, value);
 	}
 	Value::Value(const std::string &value)
 	{
@@ -372,21 +372,21 @@ namespace Jzon
 		std::stringstream sstr;
 		sstr << value;
 		valueStr = sstr.str();
-		type = VT_NUMBER;
+		type     = VT_NUMBER;
 	}
 	void Value::Set(const float value)
 	{
 		std::stringstream sstr;
 		sstr << value;
 		valueStr = sstr.str();
-		type = VT_NUMBER;
+		type     = VT_NUMBER;
 	}
 	void Value::Set(const double value)
 	{
 		std::stringstream sstr;
 		sstr << value;
 		valueStr = sstr.str();
-		type = VT_NUMBER;
+		type     = VT_NUMBER;
 	}
 	void Value::Set(const bool value)
 	{
@@ -1313,7 +1313,7 @@ namespace Jzon
 
 			if (number)
 			{
-				data.push(std::make_pair(Value::VT_DOUBLE, value));
+				data.push(std::make_pair(Value::VT_NUMBER, value));
 			}
 			else
 			{
