@@ -611,6 +611,7 @@ namespace Jzon
 		for (ChildList::iterator it = children.begin(); it != children.end(); ++it)
 		{
 			delete (*it).second;
+			(*it).second = NULL;
 		}
 		children.clear();
 	}
@@ -747,6 +748,7 @@ namespace Jzon
 		for (ChildList::iterator it = children.begin(); it != children.end(); ++it)
 		{
 			delete (*it);
+			(*it) = NULL;
 		}
 		children.clear();
 	}
@@ -1016,14 +1018,44 @@ namespace Jzon
 				}
 			case T_OBJ_BEGIN :
 				{
-					Node *node = new Object;
+					Node *node = NULL;
+					if (nodeStack.empty())
+					{
+						if (!root.IsObject())
+						{
+							error = "The given root node is not an object";
+							return false;
+						}
+
+						node = &root;
+					}
+					else
+					{
+						node = new Object;
+					}
+
 					nodeStack.push(std::make_pair(name, node));
 					name.clear();
 					break;
 				}
 			case T_ARRAY_BEGIN :
 				{
-					Node *node = new Array;
+					Node *node = NULL;
+					if (nodeStack.empty())
+					{
+						if (!root.IsArray())
+						{
+							error = "The given root node is not an array";
+							return false;
+						}
+
+						node = &root;
+					}
+					else
+					{
+						node = new Array;
+					}
+
 					nodeStack.push(std::make_pair(name, node));
 					name.clear();
 					break;
@@ -1051,14 +1083,7 @@ namespace Jzon
 					Node *node = nodeStack.top().second;
 					nodeStack.pop();
 
-					if (nodeStack.empty())
-					{
-						if (!setRoot(*node))
-							return false;
-						delete node;
-						node = NULL;
-					}
-					else
+					if (!nodeStack.empty())
 					{
 						if (nodeStack.top().second->IsObject())
 						{
@@ -1097,14 +1122,29 @@ namespace Jzon
 					}
 					else
 					{
-						Node *node;
-						if (data.front().first == Value::VT_STRING)
+						Node *node = NULL;
+						if (nodeStack.empty())
 						{
-							node = new Value(data.front().second); // This constructor calls UnescapeString()
+							if (!root.IsValue())
+							{
+								error = "The given root node is not a value";
+								return false;
+							}
+
+							node = &root;
 						}
 						else
 						{
-							node = new Value(data.front().first, data.front().second);
+							node = new Value;
+						}
+
+						if (data.front().first == Value::VT_STRING)
+						{
+							static_cast<Value*>(node)->Set(data.front().second); // This constructor calls UnescapeString()
+						}
+						else
+						{
+							static_cast<Value*>(node)->Set(data.front().first, data.front().second);
 						}
 						data.pop();
 
@@ -1123,10 +1163,6 @@ namespace Jzon
 						{
 							nodeStack.push(std::make_pair(name, node));
 							name.clear();
-							if (!setRoot(*node))
-								return false;
-							delete node;
-							node = NULL;
 						}
 					}
 					break;
@@ -1211,26 +1247,5 @@ namespace Jzon
 	bool Parser::isNumber(char c) const
 	{
 		return ((c >= '0' && c <= '9') || c == '.' || c == '-');
-	}
-
-	bool Parser::setRoot(Jzon::Node &node)
-	{
-		if (root.GetType() == node.GetType())
-		{
-			//root = node;
-			root.~Node();
-			switch (node.GetType())
-			{
-			case Node::T_OBJECT : new (&root) Object(node); break;
-			case Node::T_ARRAY  : new (&root) Array(node);  break;
-			case Node::T_VALUE  : new (&root) Value(node);  break;
-			}
-			return true;
-		}
-		else
-		{
-			error = "Root is of the wrong type";
-			return false;
-		}
 	}
 }

@@ -392,8 +392,6 @@ namespace Jzon
 
 		bool isNumber(char c) const;
 
-		bool setRoot(Jzon::Node &node);
-
 		std::string json;
 
 		std::queue<Token> tokens;
