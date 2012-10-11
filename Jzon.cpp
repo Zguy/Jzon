@@ -460,47 +460,6 @@ namespace Jzon
 			value += valueStr;
 		return value;
 	}
-	void Value::Read(const std::string &_json)
-	{
-		std::string json;
-		RemoveWhitespace(_json, json);
-
-		if (json.at(0) == '"' && json.at(json.size()-1) == '"')
-		{
-			valueStr = UnescapeString(json.substr(1, json.size()-2));
-			type = VT_STRING;
-		}
-		else if (json == "true" || json == "false")
-		{
-			valueStr = json;
-			type = VT_BOOL;
-		}
-		else
-		{
-			bool onlyNumbers = true;
-
-			for (std::string::const_iterator it = json.begin(); it != json.end(); ++it)
-			{
-				char c = (*it);
-
-				if (c != '0' && c != '1' && c != '2' && c != '3' && c != '4' && c != '5' && c != '6' && c != '7' && c != '8' && c != '9' && c != '.' && c != '-')
-				{
-					onlyNumbers = false;
-				}
-			}
-
-			if (onlyNumbers)
-			{
-				valueStr = json;
-				type = VT_NUMBER;
-			}
-			else
-			{
-				valueStr = "";
-				type = VT_NULL;
-			}
-		}
-	}
 
 	Node *Value::GetCopy() const
 	{
@@ -726,71 +685,6 @@ namespace Jzon
 		json += fi.GetNewline() + fi.GetIndentation(level) + "}";
 		return json;
 	}
-	void Object::Read(const std::string &_json)
-	{
-		std::string json;
-		RemoveWhitespace(_json, json);
-
-		std::string name;
-		std::string value;
-		bool atName = true;
-		int numOpen = 0;
-		bool inString = false;
-
-		for (std::string::const_iterator it = json.begin(); it != json.end(); ++it)
-		{
-			char c0 = '\0';
-			const char &c = (*it);
-			if (it != json.begin())
-				c0 = (*(it-1));
-
-			if ((c == '{' || c == '[') && !inString)
-			{
-				++numOpen;
-			}
-			else if ((c == '}' || c == ']') && !inString)
-			{
-				--numOpen;
-			}
-			else if (c0 != '\\' && c == '"')
-			{
-				inString = !inString;
-			}
-
-			if (atName)
-			{
-				if (!inString && c == ':')
-					atName = false;
-				else if (c != '"' && c != '{' && c != '}')
-					name += c;
-			}
-			else
-			{
-				if (((numOpen == 1 && !inString && c == ','))||(numOpen == 0))
-				{
-					if (!value.empty())
-					{
-						Node *node = NULL;
-						switch (Node::DetermineType(value))
-						{
-						case T_VALUE  : node = new Value;  break;
-						case T_OBJECT : node = new Object; break;
-						case T_ARRAY  : node = new Array;  break;
-						}
-						node->Read(value);
-						Add(name, *node);
-						delete node;
-					}
-
-					name.clear();
-					value.clear();
-					atName = true;
-				}
-				else
-					value += c;
-			}
-		}
-	}
 
 	Node *Object::GetCopy() const
 	{
@@ -922,60 +816,6 @@ namespace Jzon
 		json += fi.GetNewline() + fi.GetIndentation(level) + "]";
 		return json;
 	}
-	void Array::Read(const std::string &_json)
-	{
-		std::string json;
-		RemoveWhitespace(_json, json);
-
-		std::string value;
-		int numOpen = 0;
-		bool inString = false;
-
-		for (std::string::const_iterator it = json.begin(); it != json.end(); ++it)
-		{
-			char c0 = '\0';
-			const char &c = (*it);
-			if (it != json.begin())
-				c0 = (*(it-1));
-
-			if ((c == '{' || c == '[') && !inString)
-			{
-				++numOpen;
-			}
-			else if ((c == '}' || c == ']') && !inString)
-			{
-				--numOpen;
-			}
-			else if (c0 != '\\' && c == '"')
-			{
-				inString = !inString;
-			}
-
-			if (((numOpen == 1 && !inString && c == ','))||(numOpen == 0))
-			{
-				if (!value.empty())
-				{
-					Node *node = NULL;
-					switch (Node::DetermineType(value))
-					{
-					case T_VALUE  : node = new Value;  break;
-					case T_OBJECT : node = new Object; break;
-					case T_ARRAY  : node = new Array;  break;
-					}
-					node->Read(value);
-					Add(*node);
-					delete node;
-				}
-
-				value.clear();
-			}
-			else
-			{
-				if (numOpen > 1 || (c != '[' && c != ']'))
-				value += c;
-			}
-		}
-	}
 
 	Node *Array::GetCopy() const
 	{
@@ -1009,13 +849,11 @@ namespace Jzon
 		std::fstream file(filename.c_str(), std::ios::in | std::ios::binary);
 
 		file.seekg(0, std::ios::end);
-		int size = file.tellg();
+		std::ios::pos_type size = file.tellg();
 		file.seekg(0, std::ios::beg);
 
-		std::string rawjson(size, '\0');
-		file.read(&rawjson[0], size);
-
-		RemoveWhitespace(rawjson, json);
+		json.resize(static_cast<std::string::size_type>(size), '\0');
+		file.read(&json[0], size);
 	}
 	FileReader::~FileReader()
 	{

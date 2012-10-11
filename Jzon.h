@@ -112,7 +112,6 @@ namespace Jzon
 		virtual Node &Get(size_t index, Node &def) const { throw TypeException(); }
 
 		virtual std::string Write(const Format &format = NoFormat, unsigned int level = 0) const = 0;
-		virtual void Read(const std::string &json) = 0;
 
 		static Type DetermineType(const std::string &json);
 
@@ -180,7 +179,6 @@ namespace Jzon
 		bool operator!=(const Value &other) const;
 
 		virtual std::string Write(const Format &format = NoFormat, unsigned int level = 0) const;
-		virtual void Read(const std::string &json);
 
 	protected:
 		virtual Node *GetCopy() const;
@@ -255,7 +253,6 @@ namespace Jzon
 		virtual Node &Get(const std::string &name, Node &def) const;
 
 		virtual std::string Write(const Format &format = NoFormat, unsigned int level = 0) const;
-		virtual void Read(const std::string &json);
 
 	protected:
 		virtual Node *GetCopy() const;
@@ -325,7 +322,6 @@ namespace Jzon
 		virtual Node &Get(size_t index, Node &def) const;
 
 		virtual std::string Write(const Format &format = NoFormat, unsigned int level = 0) const;
-		virtual void Read(const std::string &json);
 
 	protected:
 		virtual Node *GetCopy() const;
@@ -408,6 +404,8 @@ namespace Jzon
 		Node &root;
 
 		std::string error;
+
+		Parser &operator=(const Parser&);
 	};
 }
 
