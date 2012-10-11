@@ -365,8 +365,8 @@ namespace Jzon
 	class Parser
 	{
 	public:
-		Parser();
-		Parser(const std::string &json);
+		Parser(Jzon::Node &root);
+		Parser(Jzon::Node &root, const std::string &json);
 		~Parser();
 
 		void SetJson(const std::string &json);
@@ -396,12 +396,16 @@ namespace Jzon
 
 		bool isNumber(char c) const;
 
+		bool setRoot(Jzon::Node &node);
+
 		std::string json;
 
 		std::queue<Token> tokens;
 		std::queue<std::pair<Value::ValueType, std::string> > data;
 
 		unsigned int cursor;
+
+		Node &root;
 
 		std::string error;
 	};

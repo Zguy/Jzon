@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2011 Johannes Häggqvist
+Copyright (c) 2011 Johannes HÃ¤ggqvist
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -354,8 +354,8 @@ namespace Jzon
 	}
 	void Value::Set(ValueType type, const std::string &value)
 	{
-		valueStr = value;
-		type     = type;
+		valueStr   = value;
+		this->type = type;
 	}
 	void Value::Set(const std::string &value)
 	{
@@ -1006,16 +1006,14 @@ namespace Jzon
 
 	FileReader::FileReader(const std::string &filename)
 	{
-		std::fstream file(filename.c_str(), std::ios::in);
+		std::fstream file(filename.c_str(), std::ios::in | std::ios::binary);
 
-		std::string rawjson = "";
+		file.seekg(0, std::ios::end);
+		int size = file.tellg();
+		file.seekg(0, std::ios::beg);
 
-		std::string line;
-		while (!file.eof())
-		{
-			std::getline(file, line);
-			rawjson += line + '\n';
-		}
+		std::string rawjson(size, '\0');
+		file.read(&rawjson[0], size);
 
 		RemoveWhitespace(rawjson, json);
 	}
@@ -1031,14 +1029,8 @@ namespace Jzon
 
 	void FileReader::Read(Node &node)
 	{
-		if (DetermineType() == node.GetType())
-		{
-			node.Read(json);
-		}
-		else
-		{
-			throw TypeException();
-		}
+		Parser parser(node, json);
+		parser.Parse();
 	}
 
 	Node::Type FileReader::DetermineType()
@@ -1047,10 +1039,10 @@ namespace Jzon
 	}
 
 
-	Parser::Parser()
+	Parser::Parser(Jzon::Node &root) : root(root)
 	{
 	}
-	Parser::Parser(const std::string &json)
+	Parser::Parser(Jzon::Node &root, const std::string &json) : root(root)
 	{
 		SetJson(json);
 	}
@@ -1089,39 +1081,50 @@ namespace Jzon
 
 			saveBuffer = true;
 
-			if (c == '{')
+			switch (c)
 			{
-				token = T_OBJ_BEGIN;
-			}
-			else if (c == '}')
-			{
-				token = T_OBJ_END;
-			}
-			else if (c == '[')
-			{
-				token = T_ARRAY_BEGIN;
-			}
-			else if (c == ']')
-			{
-				token = T_ARRAY_END;
-			}
-			else if (c == ',')
-			{
-				token = T_SEPARATOR_NODE;
-			}
-			else if (c == ':')
-			{
-				token = T_SEPARATOR_NAME;
-			}
-			else if (c == '"')
-			{
-				token = T_VALUE;
-				readString();
-			}
-			else
-			{
-				valueBuffer += c;
-				saveBuffer = false;
+			case '{' :
+				{
+					token = T_OBJ_BEGIN;
+					break;
+				}
+			case '}' :
+				{
+					token = T_OBJ_END;
+					break;
+				}
+			case '[' :
+				{
+					token = T_ARRAY_BEGIN;
+					break;
+				}
+			case ']' :
+				{
+					token = T_ARRAY_END;
+					break;
+				}
+			case ',' :
+				{
+					token = T_SEPARATOR_NODE;
+					break;
+				}
+			case ':' :
+				{
+					token = T_SEPARATOR_NAME;
+					break;
+				}
+			case '"' :
+				{
+					token = T_VALUE;
+					readString();
+					break;
+				}
+			default :
+				{
+					valueBuffer += c;
+					saveBuffer = false;
+					break;
+				}
 			}
 
 			if ((saveBuffer || cursor == json.size()-1) && (!valueBuffer.empty())) // Always save buffer on the last character
@@ -1154,11 +1157,9 @@ namespace Jzon
 	}
 	bool Parser::assemble()
 	{
-		Node *root = NULL;
-		std::stack<Node*> nodeStack;
+		std::stack<std::pair<std::string, Node*>> nodeStack;
 
-		std::string name;
-		bool isName = true;
+		std::string name = "";
 
 		Token token;
 		while (!tokens.empty())
@@ -1166,86 +1167,131 @@ namespace Jzon
 			token = tokens.front();
 			tokens.pop();
 
-			if (token == T_UNKNOWN)
+			switch (token)
 			{
-				const std::string &unknownToken = data.front().second;
-				error = "Unknown token: "+unknownToken;
-				data.pop();
-				return false;
-			}
-			else if (token == T_OBJ_BEGIN)
-			{
-				Node *node = new Object;
-				if (!nodeStack.empty())
+			case T_UNKNOWN :
 				{
-					if (nodeStack.top()->IsObject())
-						nodeStack.top()->AsObject().Add(name, *node);
-					else if (nodeStack.top()->IsArray())
-						nodeStack.top()->AsArray().Add(*node);
+					const std::string &unknownToken = data.front().second;
+					error = "Unknown token: "+unknownToken;
+					data.pop();
+					return false;
 				}
-
-				nodeStack.push(node);
-			}
-			else if (token == T_ARRAY_BEGIN)
-			{
-				Node *node = new Array;
-				if (!nodeStack.empty())
+			case T_OBJ_BEGIN :
 				{
-					if (nodeStack.top()->IsObject())
-						nodeStack.top()->AsObject().Add(name, *node);
-					else if (nodeStack.top()->IsArray())
-						nodeStack.top()->AsArray().Add(*node);
+					Node *node = new Object;
+					nodeStack.push(std::make_pair(name, node));
+					name.clear();
+					break;
 				}
-
-				nodeStack.push(node);
-			}
-			else if (token == T_OBJ_END || token == T_ARRAY_END)
-			{
-				if (nodeStack.size() == 1)
+			case T_ARRAY_BEGIN :
 				{
-					root = nodeStack.top();
+					Node *node = new Array;
+					nodeStack.push(std::make_pair(name, node));
+					name.clear();
+					break;
 				}
-				nodeStack.pop();
-			}
-			else if (token == T_VALUE)
-			{
-				if (tokens.front() == T_SEPARATOR_NAME)
+			case T_OBJ_END :
+			case T_ARRAY_END :
 				{
-					tokens.pop();
-					if (data.front().first != Value::VT_STRING)
+					if (nodeStack.empty())
 					{
-						error = "A name has to be a string";
+						error = "Found end of object or array without beginning";
 						return false;
 					}
+					if (token == T_OBJ_END && !nodeStack.top().second->IsObject())
+					{
+						error = "Mismatched end and beginning of object";
+						return false;
+					}
+					if (token == T_ARRAY_END && !nodeStack.top().second->IsArray())
+					{
+						error = "Mismatched end and beginning of array";
+						return false;
+					}
+
+					std::string name = nodeStack.top().first;
+					Node *node = nodeStack.top().second;
+					nodeStack.pop();
+
+					if (nodeStack.empty())
+					{
+						if (!setRoot(*node))
+							return false;
+						delete node;
+						node = NULL;
+					}
 					else
 					{
-						name = data.front().second;
-						data.pop();
+						if (nodeStack.top().second->IsObject())
+						{
+							nodeStack.top().second->AsObject().Add(name, *node);
+						}
+						else if (nodeStack.top().second->IsArray())
+						{
+							nodeStack.top().second->AsArray().Add(*node);
+						}
+						else
+						{
+							error = "Can only add elements to objects and arrays";
+							return false;
+						}
+
+						delete node;
+						node = NULL;
 					}
+					break;
 				}
-				else
+			case T_VALUE :
 				{
-					Node *node;
-					if (data.front().first == Value::VT_STRING)
+					if (!tokens.empty() && tokens.front() == T_SEPARATOR_NAME)
 					{
-						node = new Value(data.front().second); // This constructor calls UnescapeString()
+						tokens.pop();
+						if (data.front().first != Value::VT_STRING)
+						{
+							error = "A name has to be a string";
+							return false;
+						}
+						else
+						{
+							name = data.front().second;
+							data.pop();
+						}
 					}
 					else
 					{
-						node = new Value(data.front().first, data.front().second);
+						Node *node;
+						if (data.front().first == Value::VT_STRING)
+						{
+							node = new Value(data.front().second); // This constructor calls UnescapeString()
+						}
+						else
+						{
+							node = new Value(data.front().first, data.front().second);
+						}
+						data.pop();
+
+						if (!nodeStack.empty())
+						{
+							if (nodeStack.top().second->IsObject())
+								nodeStack.top().second->AsObject().Add(name, *node);
+							else if (nodeStack.top().second->IsArray())
+								nodeStack.top().second->AsArray().Add(*node);
+
+							delete node;
+							node = NULL;
+							name.clear();
+						}
+						else
+						{
+							nodeStack.push(std::make_pair(name, node));
+							name.clear();
+							if (!setRoot(*node))
+								return false;
+							delete node;
+							node = NULL;
+						}
 					}
-					data.pop();
-					if (!nodeStack.empty())
-					{
-						if (nodeStack.top()->IsObject())
-							nodeStack.top()->AsObject().Add(name, *node);
-						else if (nodeStack.top()->IsArray())
-							nodeStack.top()->AsArray().Add(*node);
-					}
-					else
-					{
-						nodeStack.push(node);
-					}
+					break;
 				}
 			}
 		}
@@ -1327,5 +1373,26 @@ namespace Jzon
 	bool Parser::isNumber(char c) const
 	{
 		return ((c >= '0' && c <= '9') || c == '.' || c == '-');
+	}
+
+	bool Parser::setRoot(Jzon::Node &node)
+	{
+		if (root.GetType() == node.GetType())
+		{
+			//root = node;
+			root.~Node();
+			switch (node.GetType())
+			{
+			case Node::T_OBJECT : new (&root) Object(node); break;
+			case Node::T_ARRAY  : new (&root) Array(node);  break;
+			case Node::T_VALUE  : new (&root) Value(node);  break;
+			}
+			return true;
+		}
+		else
+		{
+			error = "Root is of the wrong type";
+			return false;
+		}
 	}
 }
