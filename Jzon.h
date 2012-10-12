@@ -38,21 +38,23 @@ namespace Jzon
 	typedef std::pair<std::string, Node&> NamedNode;
 	typedef std::pair<std::string, Node*> NamedNodePtr;
 	
-	class TypeException : public std::exception
+	class TypeException : public std::logic_error
 	{
 	public:
-		virtual const char *what() const throw()
-		{
-			return "A Node was used as the wrong type";
-		}
+		TypeException() : std::logic_error("A Node was used as the wrong type")
+		{}
 	};
-	class ValueException : public std::exception
+	class ValueException : public std::logic_error
 	{
 	public:
-		virtual const char *what() const throw()
-		{
-			return "A Value was used as the wrong type";
-		}
+		ValueException() : std::logic_error("A Value was used as the wrong type")
+		{}
+	};
+	class NotFoundException : public std::out_of_range
+	{
+	public:
+		NotFoundException() : std::out_of_range("The node could not be found")
+		{}
 	};
 
 	struct Format
@@ -106,10 +108,8 @@ namespace Jzon
 		virtual bool ToBool() const { throw TypeException(); }
 
 		virtual size_t GetCount() const { return 0; }
-		virtual Node &Get(const std::string &name) const { throw TypeException(); }
-		virtual Node &Get(const std::string &name, Node &def) const { throw TypeException(); }
-		virtual Node &Get(size_t index) const { throw TypeException(); }
-		virtual Node &Get(size_t index, Node &def) const { throw TypeException(); }
+		virtual Node &Get(const std::string &name) const { name; throw TypeException(); }
+		virtual Node &Get(size_t index) const { index; throw TypeException(); }
 
 		static Type DetermineType(const std::string &json);
 
@@ -246,7 +246,6 @@ namespace Jzon
 
 		virtual size_t GetCount() const;
 		virtual Node &Get(const std::string &name) const;
-		virtual Node &Get(const std::string &name, Node &def) const;
 
 	protected:
 		virtual Node *GetCopy() const;
@@ -313,7 +312,6 @@ namespace Jzon
 
 		virtual size_t GetCount() const;
 		virtual Node &Get(size_t index) const;
-		virtual Node &Get(size_t index, Node &def) const;
 
 	protected:
 		virtual Node *GetCopy() const;

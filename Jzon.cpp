@@ -633,11 +633,6 @@ namespace Jzon
 	}
 	Node &Object::Get(const std::string &name) const
 	{
-		Value value;
-		return Get(name, value);
-	}
-	Node &Object::Get(const std::string &name, Node &def) const
-	{
 		for (ChildList::const_iterator it = children.begin(); it != children.end(); ++it)
 		{
 			if ((*it).first == name)
@@ -645,7 +640,8 @@ namespace Jzon
 				return *(*it).second;
 			}
 		}
-		return def;
+		
+		throw NotFoundException();
 	}
 
 	Node *Object::GetCopy() const
@@ -749,15 +745,12 @@ namespace Jzon
 	}
 	Node &Array::Get(size_t index) const
 	{
-		Value value;
-		return Get(index, value);
-	}
-	Node &Array::Get(size_t index, Node &def) const
-	{
 		if (index < children.size())
+		{
 			return *children.at(index);
-		else
-			return def;
+		}
+
+		throw NotFoundException();
 	}
 
 	Node *Array::GetCopy() const
