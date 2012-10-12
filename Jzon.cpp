@@ -31,20 +31,19 @@ namespace Jzon
 	class FormatInterpreter
 	{
 	public:
-		FormatInterpreter(const Format &format) : format(format)
+		FormatInterpreter()
 		{
-			if (format.useTabs)
-			{
-				indentationChar = '\t';
-			}
-			else
-			{
-				for (unsigned int i = 0; i < format.indentSize; ++i)
-				{
-					indentationChar += ' ';
-				}
-			}
+			SetFormat(NoFormat);
+		}
+		FormatInterpreter(const Format &format)
+		{
+			SetFormat(format);
+		}
 
+		void SetFormat(const Format &format)
+		{
+			this->format = format;
+			indentationChar = (format.useTabs ? '\t' : ' ');
 			spacing = (format.spacing ? " " : "");
 			newline = (format.newline ? "\n" : spacing);
 		}
@@ -52,15 +51,12 @@ namespace Jzon
 		std::string GetIndentation(unsigned int level) const
 		{
 			if (!format.newline)
+			{
 				return "";
+			}
 			else
 			{
-				std::string ind;
-				for (unsigned int i = 0; i < level; ++i)
-				{
-					ind += indentationChar;
-				}
-				return ind;
+				return std::string(format.indentSize * level, indentationChar);
 			}
 		}
 		
@@ -74,10 +70,8 @@ namespace Jzon
 		}
 
 	private:
-		FormatInterpreter &operator=(const FormatInterpreter&);
-
-		const Format &format;
-		std::string indentationChar;
+		Format format;
+		char indentationChar;
 		std::string newline;
 		std::string spacing;
 	};
@@ -455,7 +449,7 @@ namespace Jzon
 		if (type == VT_NULL)
 			value += "null";
 		else if (type == VT_STRING)
-			value += "\""+EscapeString()+"\"";
+			value += "\""+EscapeString(valueStr)+"\"";
 		else
 			value += valueStr;
 		return value;
@@ -501,11 +495,11 @@ namespace Jzon
 		return nullUnescaped;
 	}
 
-	std::string Value::EscapeString() const
+	std::string Value::EscapeString(const std::string &value)
 	{
 		std::string escaped;
 
-		for (std::string::const_iterator it = valueStr.begin(); it != valueStr.end(); ++it)
+		for (std::string::const_iterator it = value.begin(); it != value.end(); ++it)
 		{
 			const char &c = (*it);
 
@@ -523,7 +517,7 @@ namespace Jzon
 
 		return escaped;
 	}
-	std::string Value::UnescapeString(const std::string &value) const
+	std::string Value::UnescapeString(const std::string &value)
 	{
 		std::string unescaped;
 
@@ -832,16 +826,19 @@ namespace Jzon
 	{
 	}
 
-	void FileWriter::WriteFile(const std::string &filename, Node &root, const Format &format)
+	void FileWriter::WriteFile(const std::string &filename, const Node &root, const Format &format)
 	{
 		FileWriter writer;
 		writer.Write(filename, root, format);
 	}
 
-	void FileWriter::Write(const std::string &filename, Node &root, const Format &format)
+	void FileWriter::Write(const std::string &filename, const Node &root, const Format &format)
 	{
+		Writer writer(root, filename, format);
+		writer.Write();
+
 		std::fstream file(filename.c_str(), std::ios::out | std::ios::trunc);
-		file << root.Write(format);
+		file << writer.GetResult();
 		file.close();
 	}
 
@@ -892,10 +889,99 @@ namespace Jzon
 	}
 
 
-	Parser::Parser(Jzon::Node &root) : root(root)
+	Writer::Writer(const Node &root, const Format &format) : root(root), fi(new FormatInterpreter)
+	{
+		SetFormat(format);
+	}
+	Writer::Writer(const Node &root, const std::string &filename, const Format &format) : root(root), fi(new FormatInterpreter)
+	{
+		SetFilename(filename);
+		SetFormat(format);
+	}
+	Writer::~Writer()
+	{
+		delete fi;
+		fi = NULL;
+	}
+
+	void Writer::SetFilename(const std::string &filename)
+	{
+		this->filename = filename;
+	}
+	void Writer::SetFormat(const Format &format)
+	{
+		fi->SetFormat(format);
+	}
+	void Writer::Write()
+	{
+		result.clear();
+		writeNode(root, 0);
+	}
+
+	const std::string &Writer::GetResult() const
+	{
+		return result;
+	}
+
+	void Writer::writeNode(const Node &node, unsigned int level)
+	{
+		switch (node.GetType())
+		{
+		case Node::T_OBJECT : writeObject(node.AsObject(), level); break;
+		case Node::T_ARRAY  : writeArray(node.AsArray(), level);   break;
+		case Node::T_VALUE  : writeValue(node.AsValue());          break;
+		}
+	}
+	void Writer::writeObject(const Object &node, unsigned int level)
+	{
+		result += "{" + fi->GetNewline();
+
+		for (Object::const_iterator it = node.begin(); it != node.end(); ++it)
+		{
+			const std::string &name = (*it).first;
+			const Node &value = (*it).second;
+
+			if (it != node.begin())
+				result += "," + fi->GetNewline();
+			result += fi->GetIndentation(level+1) + "\""+name+"\"" + ":" + fi->GetSpacing();
+			writeNode(value, level+1);
+		}
+
+		result += fi->GetNewline() + fi->GetIndentation(level) + "}";
+	}
+	void Writer::writeArray(const Array &node, unsigned int level)
+	{
+		result += "[" + fi->GetNewline();
+
+		for (Array::const_iterator it = node.begin(); it != node.end(); ++it)
+		{
+			const Node &value = (*it);
+
+			if (it != node.begin())
+				result += "," + fi->GetNewline();
+			result += fi->GetIndentation(level+1);
+			writeNode(value, level+1);
+		}
+
+		result += fi->GetNewline() + fi->GetIndentation(level) + "]";
+	}
+	void Writer::writeValue(const Value &node)
+	{
+		if (node.IsString())
+		{
+			result += "\""+Value::EscapeString(node.ToString())+"\"";
+		}
+		else
+		{
+			result += node.ToString();
+		}
+	}
+
+
+	Parser::Parser(Node &root) : root(root)
 	{
 	}
-	Parser::Parser(Jzon::Node &root, const std::string &json) : root(root)
+	Parser::Parser(Node &root, const std::string &json) : root(root)
 	{
 		SetJson(json);
 	}

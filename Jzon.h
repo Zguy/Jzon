@@ -62,7 +62,7 @@ namespace Jzon
 		bool useTabs;
 		unsigned int indentSize;
 	};
-	static const Format StandardFormat = { true, true, true, 0 };
+	static const Format StandardFormat = { true, true, true, 1 };
 	static const Format NoFormat = { false, false, false, 0 };
 
 	class Node
@@ -180,13 +180,13 @@ namespace Jzon
 
 		virtual std::string Write(const Format &format = NoFormat, unsigned int level = 0) const;
 
+		static std::string EscapeString(const std::string &value);
+		static std::string UnescapeString(const std::string &value);
+
 	protected:
 		virtual Node *GetCopy() const;
 
 	private:
-		std::string EscapeString() const;
-		std::string UnescapeString(const std::string &value) const;
-
 		std::string valueStr;
 		ValueType type;
 	};
@@ -337,9 +337,9 @@ namespace Jzon
 		FileWriter();
 		~FileWriter();
 
-		static void WriteFile(const std::string &filename, Node &root, const Format &format = NoFormat);
+		static void WriteFile(const std::string &filename, const Node &root, const Format &format = NoFormat);
 
-		void Write(const std::string &filename, Node &root, const Format &format = NoFormat);
+		void Write(const std::string &filename, const Node &root, const Format &format = NoFormat);
 	};
 
 	class FileReader
@@ -361,11 +361,40 @@ namespace Jzon
 		std::string error;
 	};
 
+	class Writer
+	{
+	public:
+		Writer(const Node &root, const Format &format = NoFormat);
+		Writer(const Node &root, const std::string &filename, const Format &format = NoFormat);
+		~Writer();
+
+		void SetFilename(const std::string &filename);
+		void SetFormat(const Format &format);
+		void Write();
+
+		const std::string &GetResult() const;
+
+	private:
+		void writeNode(const Node &node, unsigned int level);
+		void writeObject(const Object &node, unsigned int level);
+		void writeArray(const Array &node, unsigned int level);
+		void writeValue(const Value &node);
+
+		std::string result;
+
+		std::string filename;
+		class FormatInterpreter *fi;
+
+		const Node &root;
+
+		Writer &operator=(const Writer&);
+	};
+
 	class Parser
 	{
 	public:
-		Parser(Jzon::Node &root);
-		Parser(Jzon::Node &root, const std::string &json);
+		Parser(Node &root);
+		Parser(Node &root, const std::string &json);
 		~Parser();
 
 		void SetJson(const std::string &json);
