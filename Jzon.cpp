@@ -861,21 +861,34 @@ namespace Jzon
 	{
 	}
 
-	void FileReader::ReadFile(const std::string &filename, Node &node)
+	bool FileReader::ReadFile(const std::string &filename, Node &node)
 	{
 		FileReader reader(filename);
-		reader.Read(node);
+		return reader.Read(node);
 	}
 
-	void FileReader::Read(Node &node)
+	bool FileReader::Read(Node &node)
 	{
 		Parser parser(node, json);
-		parser.Parse();
+		if (!parser.Parse())
+		{
+			error = parser.GetError();
+			return false;
+		}
+		else
+		{
+			return true;
+		}
 	}
 
 	Node::Type FileReader::DetermineType()
 	{
 		return Node::DetermineType(json);
+	}
+
+	const std::string &FileReader::GetError() const
+	{
+		return error;
 	}
 
 

@@ -348,14 +348,17 @@ namespace Jzon
 		FileReader(const std::string &filename);
 		~FileReader();
 
-		static void ReadFile(const std::string &filename, Node &node);
+		static bool ReadFile(const std::string &filename, Node &node);
 
-		void Read(Node &node);
+		bool Read(Node &node);
 
 		Node::Type DetermineType();
 
+		const std::string &GetError() const;
+
 	private:
 		std::string json;
+		std::string error;
 	};
 
 	class Parser
