@@ -111,8 +111,6 @@ namespace Jzon
 		virtual Node &Get(size_t index) const { throw TypeException(); }
 		virtual Node &Get(size_t index, Node &def) const { throw TypeException(); }
 
-		virtual std::string Write(const Format &format = NoFormat, unsigned int level = 0) const = 0;
-
 		static Type DetermineType(const std::string &json);
 
 	protected:
@@ -177,8 +175,6 @@ namespace Jzon
 
 		bool operator==(const Value &other) const;
 		bool operator!=(const Value &other) const;
-
-		virtual std::string Write(const Format &format = NoFormat, unsigned int level = 0) const;
 
 		static std::string EscapeString(const std::string &value);
 		static std::string UnescapeString(const std::string &value);
@@ -252,8 +248,6 @@ namespace Jzon
 		virtual Node &Get(const std::string &name) const;
 		virtual Node &Get(const std::string &name, Node &def) const;
 
-		virtual std::string Write(const Format &format = NoFormat, unsigned int level = 0) const;
-
 	protected:
 		virtual Node *GetCopy() const;
 
@@ -320,8 +314,6 @@ namespace Jzon
 		virtual size_t GetCount() const;
 		virtual Node &Get(size_t index) const;
 		virtual Node &Get(size_t index, Node &def) const;
-
-		virtual std::string Write(const Format &format = NoFormat, unsigned int level = 0) const;
 
 	protected:
 		virtual Node *GetCopy() const;

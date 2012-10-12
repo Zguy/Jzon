@@ -60,11 +60,11 @@ namespace Jzon
 			}
 		}
 		
-		inline std::string GetNewline() const
+		inline const std::string &GetNewline() const
 		{
 			return newline;
 		}
-		inline std::string GetSpacing() const
+		inline const std::string &GetSpacing() const
 		{
 			return spacing;
 		}
@@ -443,18 +443,6 @@ namespace Jzon
 		return !(*this == other);
 	}
 
-	std::string Value::Write(const Format &format, unsigned int level) const
-	{
-		std::string value;
-		if (type == VT_NULL)
-			value += "null";
-		else if (type == VT_STRING)
-			value += "\""+EscapeString(valueStr)+"\"";
-		else
-			value += valueStr;
-		return value;
-	}
-
 	Node *Value::GetCopy() const
 	{
 		return new Value(*this);
@@ -660,27 +648,6 @@ namespace Jzon
 		return def;
 	}
 
-	std::string Object::Write(const Format &format, unsigned int level) const
-	{
-		FormatInterpreter fi(format);
-
-		std::string json;
-		json += "{" + fi.GetNewline();
-
-		for (ChildList::const_iterator it = children.begin(); it != children.end(); ++it)
-		{
-			const std::string &name = (*it).first;
-			Node &value = *(*it).second;
-
-			if (it != children.begin())
-				json += "," + fi.GetNewline();
-			json += fi.GetIndentation(level+1) + "\""+name+"\"" + ":" + fi.GetSpacing() + value.Write(format, level+1);
-		}
-
-		json += fi.GetNewline() + fi.GetIndentation(level) + "}";
-		return json;
-	}
-
 	Node *Object::GetCopy() const
 	{
 		return new Object(*this);
@@ -791,26 +758,6 @@ namespace Jzon
 			return *children.at(index);
 		else
 			return def;
-	}
-
-	std::string Array::Write(const Format &format, unsigned int level) const
-	{
-		FormatInterpreter fi(format);
-
-		std::string json;
-		json += "[" + fi.GetNewline();
-
-		for (ChildList::const_iterator it = children.begin(); it != children.end(); ++it)
-		{
-			Node &value = *(*it);
-
-			if (it != children.begin())
-				json += "," + fi.GetNewline();
-			json += fi.GetIndentation(level+1) + value.Write(format, level+1);
-		}
-
-		json += fi.GetNewline() + fi.GetIndentation(level) + "]";
-		return json;
 	}
 
 	Node *Array::GetCopy() const
