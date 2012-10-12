@@ -853,7 +853,7 @@ namespace Jzon
 		file.seekg(0, std::ios::end);
 		std::ios::pos_type size = file.tellg();
 		file.seekg(0, std::ios::beg);
-
+		
 		json.resize(static_cast<std::string::size_type>(size), '\0');
 		file.read(&json[0], size);
 	}
@@ -997,7 +997,7 @@ namespace Jzon
 	}
 	bool Parser::assemble()
 	{
-		std::stack<std::pair<std::string, Node*>> nodeStack;
+		std::stack<std::pair<std::string, Node*> > nodeStack;
 
 		std::string name = "";
 
@@ -1140,7 +1140,7 @@ namespace Jzon
 
 						if (data.front().first == Value::VT_STRING)
 						{
-							static_cast<Value*>(node)->Set(data.front().second); // This constructor calls UnescapeString()
+							static_cast<Value*>(node)->Set(data.front().second); // This method calls UnescapeString()
 						}
 						else
 						{
@@ -1182,13 +1182,10 @@ namespace Jzon
 
 		++cursor;
 
+		char c1 = '\0';
 		for (; cursor < json.size(); ++cursor)
 		{
-			char c1 = '\0';
 			char c2 = json.at(cursor);
-
-			if (cursor > 0)
-				c1 = json.at(cursor-1);
 
 			if (c1 != '\\' && c2 == '"')
 			{
@@ -1196,6 +1193,8 @@ namespace Jzon
 			}
 
 			str += c2;
+
+			c1 = c2;
 		}
 
 		data.push(std::make_pair(Value::VT_STRING, str));
@@ -1203,7 +1202,7 @@ namespace Jzon
 
 	bool Parser::interpretValue(const std::string &value)
 	{
-		std::string upperValue(value.size(), ' ');
+		std::string upperValue(value.size(), '\0');
 
 		std::transform(value.begin(), value.end(), upperValue.begin(), toupper);
 
