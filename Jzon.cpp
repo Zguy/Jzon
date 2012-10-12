@@ -627,6 +627,17 @@ namespace Jzon
 			return Object::const_iterator(NULL);
 	}
 
+	bool Object::Has(const std::string &name) const
+	{
+		for (ChildList::const_iterator it = children.begin(); it != children.end(); ++it)
+		{
+			if ((*it).first == name)
+			{
+				return true;
+			}
+		}
+		return false;
+	}
 	size_t Object::GetCount() const
 	{
 		return children.size();
