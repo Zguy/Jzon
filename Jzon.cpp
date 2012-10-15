@@ -23,8 +23,8 @@ THE SOFTWARE.
 
 #include <sstream>
 #include <fstream>
-
 #include <stack>
+#include <algorithm>
 
 namespace Jzon
 {

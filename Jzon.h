@@ -25,7 +25,6 @@ THE SOFTWARE.
 #include <string>
 #include <vector>
 #include <queue>
-#include <utility>
 #include <iterator>
 #include <exception>
 
