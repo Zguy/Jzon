@@ -26,7 +26,7 @@ THE SOFTWARE.
 #include <vector>
 #include <queue>
 #include <iterator>
-#include <exception>
+#include <stdexcept>
 
 namespace Jzon
 {
@@ -106,10 +106,10 @@ namespace Jzon
 		virtual double ToDouble() const { throw TypeException(); }
 		virtual bool ToBool() const { throw TypeException(); }
 
-		virtual bool Has(const std::string &name) const { name; throw TypeException(); }
+		virtual bool Has(const std::string &name) const { throw TypeException(); }
 		virtual size_t GetCount() const { return 0; }
-		virtual Node &Get(const std::string &name) const { name; throw TypeException(); }
-		virtual Node &Get(size_t index) const { index; throw TypeException(); }
+		virtual Node &Get(const std::string &name) const { throw TypeException(); }
+		virtual Node &Get(size_t index) const { throw TypeException(); }
 
 		static Type DetermineType(const std::string &json);
 
