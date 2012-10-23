@@ -356,10 +356,8 @@ namespace Jzon
 	{
 	public:
 		Writer(const Node &root, const Format &format = NoFormat);
-		Writer(const Node &root, const std::string &filename, const Format &format = NoFormat);
 		~Writer();
 
-		void SetFilename(const std::string &filename);
 		void SetFormat(const Format &format);
 		void Write();
 
@@ -373,7 +371,6 @@ namespace Jzon
 
 		std::string result;
 
-		std::string filename;
 		class FormatInterpreter *fi;
 
 		const Node &root;

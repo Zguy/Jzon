@@ -785,7 +785,7 @@ namespace Jzon
 
 	void FileWriter::Write(const std::string &filename, const Node &root, const Format &format)
 	{
-		Writer writer(root, filename, format);
+		Writer writer(root, format);
 		writer.Write();
 
 		std::fstream file(filename.c_str(), std::ios::out | std::ios::trunc);
@@ -844,21 +844,12 @@ namespace Jzon
 	{
 		SetFormat(format);
 	}
-	Writer::Writer(const Node &root, const std::string &filename, const Format &format) : fi(new FormatInterpreter), root(root)
-	{
-		SetFilename(filename);
-		SetFormat(format);
-	}
 	Writer::~Writer()
 	{
 		delete fi;
 		fi = NULL;
 	}
 
-	void Writer::SetFilename(const std::string &filename)
-	{
-		this->filename = filename;
-	}
 	void Writer::SetFormat(const Format &format)
 	{
 		fi->SetFormat(format);
