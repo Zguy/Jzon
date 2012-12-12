@@ -796,14 +796,10 @@ namespace Jzon
 
 	FileReader::FileReader(const std::string &filename)
 	{
-		std::fstream file(filename.c_str(), std::ios::in | std::ios::binary);
-
-		file.seekg(0, std::ios::end);
-		std::ios::pos_type size = file.tellg();
-		file.seekg(0, std::ios::beg);
-		
-		json.resize(static_cast<std::string::size_type>(size), '\0');
-		file.read(&json[0], size);
+		if (!loadFile(filename, json))
+		{
+			error = "Failed to load file";
+		}
 	}
 	FileReader::~FileReader()
 	{
@@ -817,6 +813,9 @@ namespace Jzon
 
 	bool FileReader::Read(Node &node)
 	{
+		if (!error.empty())
+			return false;
+
 		Parser parser(node, json);
 		if (!parser.Parse())
 		{
@@ -837,6 +836,25 @@ namespace Jzon
 	const std::string &FileReader::GetError() const
 	{
 		return error;
+	}
+
+	bool FileReader::loadFile(const std::string &filename, std::string &json)
+	{
+		std::fstream file(filename.c_str(), std::ios::in | std::ios::binary);
+
+		if (!file.is_open())
+		{
+			return false;
+		}
+
+		file.seekg(0, std::ios::end);
+		std::ios::pos_type size = file.tellg();
+		file.seekg(0, std::ios::beg);
+
+		json.resize(static_cast<std::string::size_type>(size), '\0');
+		file.read(&json[0], size);
+
+		return true;
 	}
 
 
