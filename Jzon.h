@@ -325,12 +325,15 @@ namespace Jzon
 	class FileWriter
 	{
 	public:
-		FileWriter();
+		FileWriter(const std::string &filename);
 		~FileWriter();
 
 		static void WriteFile(const std::string &filename, const Node &root, const Format &format = NoFormat);
 
-		void Write(const std::string &filename, const Node &root, const Format &format = NoFormat);
+		void Write(const Node &root, const Format &format = NoFormat);
+
+	private:
+		std::string filename;
 	};
 
 	class FileReader

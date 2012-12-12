@@ -770,7 +770,7 @@ namespace Jzon
 	}
 
 
-	FileWriter::FileWriter()
+	FileWriter::FileWriter(const std::string &filename) : filename(filename)
 	{
 	}
 	FileWriter::~FileWriter()
@@ -779,11 +779,11 @@ namespace Jzon
 
 	void FileWriter::WriteFile(const std::string &filename, const Node &root, const Format &format)
 	{
-		FileWriter writer;
-		writer.Write(filename, root, format);
+		FileWriter writer(filename);
+		writer.Write(root, format);
 	}
 
-	void FileWriter::Write(const std::string &filename, const Node &root, const Format &format)
+	void FileWriter::Write(const Node &root, const Format &format)
 	{
 		Writer writer(root, format);
 		writer.Write();
