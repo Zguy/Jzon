@@ -198,12 +198,14 @@ namespace Jzon
 		std::string json;
 		RemoveWhitespace(_json, json);
 
-		Node::Type type;
-		switch (json.at(0))
+		Node::Type type = T_VALUE;
+		if (!json.empty())
 		{
-		case '{' : type = T_OBJECT; break;
-		case '[' : type = T_ARRAY; break;
-		default : type = T_VALUE; break;
+			switch (json.at(0))
+			{
+			case '{' : type = T_OBJECT; break;
+			case '[' : type = T_ARRAY; break;
+			}
 		}
 
 		return type;
