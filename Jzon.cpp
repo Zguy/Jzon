@@ -451,9 +451,9 @@ namespace Jzon
 	}
 
 	// This is not the most beautiful place for these, but it'll do
-	static const char charsUnescaped[] = { '\\'  , '\"'  , '\n' , '\t' , '\b' , '\f' , '\r' };
-	static const char *charsEscaped[]  = { "\\\\", "\\\"", "\\n", "\\t", "\\b", "\\f", "\\r" };
-	static const unsigned int numEscapeChars = 7;
+	static const char charsUnescaped[] = { '\\'  , '/'  , '\"'  , '\n' , '\t' , '\b' , '\f' , '\r' };
+	static const char *charsEscaped[]  = { "\\\\", "\\/", "\\\"", "\\n", "\\t", "\\b", "\\f", "\\r" };
+	static const unsigned int numEscapeChars = 8;
 	static const char nullUnescaped = '\0';
 	static const char *nullEscaped  = "\0\0";
 	const char *&getEscaped(const char &c)
