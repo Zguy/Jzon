@@ -76,71 +76,13 @@ namespace Jzon
 		std::string spacing;
 	};
 
-	void RemoveWhitespace(const std::string &json, std::string &freshJson)
+	inline bool IsWhitespace(char c)
 	{
-		freshJson.clear();
-
-		bool comment = false;
-		int multicomment = 0;
-		bool inString = false;
-
-		for (std::string::const_iterator it = json.begin(); it != json.end(); ++it)
-		{
-			char c0 = '\0';
-			char c1 = (*it);
-			char c2 = '\0';
-			if (it != json.begin())
-				c0 = (*(it-1));
-			if (it+1 != json.end())
-				c2 = (*(it+1));
-
-			if (c0 != '\\' && c1 == '"')
-			{
-				inString = !inString;
-			}
-
-			if (!inString)
-			{
-				if (c1 == '/' && c2 == '*')
-				{
-					++multicomment;
-					if (it+1 != json.end())
-						++it;
-					continue;
-				}
-				else if (c1 == '*' && c2 == '/')
-				{
-					--multicomment;
-					if (it+1 != json.end())
-						++it;
-					continue;
-				}
-				else if (c1 == '/' && c2 == '/')
-				{
-					comment = true;
-					if (it+1 != json.end())
-						++it;
-					continue;
-				}
-				else if (c1 == '\n')
-				{
-					comment = false;
-				}
-			}
-
-			if (comment || multicomment > 0)
-				continue;
-
-			if (inString)
-			{
-				freshJson += c1;
-			}
-			else
-			{
-				if ((c1 != '\n')&&(c1 != ' ')&&(c1 != '\t')&&(c1 != '\r')&&(c1 != '\f'))
-					freshJson += c1;
-			}
-		}
+		return (c == '\n' || c == ' ' || c == '\t' || c == '\r' || c == '\f');
+	}
+	inline bool IsNumber(char c)
+	{
+		return ((c >= '0' && c <= '9') || c == '.' || c == '-');
 	}
 
 	Node::Node()
@@ -193,22 +135,22 @@ namespace Jzon
 			throw TypeException();
 	}
 
-	Node::Type Node::DetermineType(const std::string &_json)
+	Node::Type Node::DetermineType(const std::string &json)
 	{
-		std::string json;
-		RemoveWhitespace(_json, json);
+		std::string::const_iterator jsonIt = json.begin();
+		
+		while (jsonIt != json.end() && IsWhitespace(*jsonIt))
+			++jsonIt;
 
-		Node::Type type = T_VALUE;
-		if (!json.empty())
+		if (jsonIt == json.end())
+			return T_VALUE;
+
+		switch (*jsonIt)
 		{
-			switch (json.at(0))
-			{
-			case '{' : type = T_OBJECT; break;
-			case '[' : type = T_ARRAY; break;
-			}
+		case '{' : return T_OBJECT;
+		case '[' : return T_ARRAY;
+		default  : return T_VALUE;
 		}
-
-		return type;
 	}
 
 
@@ -944,9 +886,8 @@ namespace Jzon
 	Parser::Parser(Node &root) : root(root)
 	{
 	}
-	Parser::Parser(Node &root, const std::string &json) : root(root)
+	Parser::Parser(Node &root, const std::string &json) : root(root), json(json)
 	{
-		SetJson(json);
 	}
 	Parser::~Parser()
 	{
@@ -954,7 +895,7 @@ namespace Jzon
 
 	void Parser::SetJson(const std::string &json)
 	{
-		RemoveWhitespace(json, this->json);
+		this->json = json;
 	}
 	bool Parser::Parse()
 	{
@@ -980,6 +921,9 @@ namespace Jzon
 		for (; cursor < json.size(); ++cursor)
 		{
 			char c = json.at(cursor);
+
+			if (IsWhitespace(c))
+				continue;
 
 			saveBuffer = true;
 
@@ -1287,7 +1231,7 @@ namespace Jzon
 			bool number = true;
 			for (std::string::const_iterator it = value.begin(); it != value.end(); ++it)
 			{
-				if (!isNumber(*it))
+				if (!IsNumber(*it))
 				{
 					number = false;
 					break;
@@ -1305,10 +1249,5 @@ namespace Jzon
 		}
 
 		return true;
-	}
-
-	bool Parser::isNumber(char c) const
-	{
-		return ((c >= '0' && c <= '9') || c == '.' || c == '-');
 	}
 }

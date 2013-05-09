@@ -415,8 +415,6 @@ namespace Jzon
 
 		bool interpretValue(const std::string &value);
 
-		bool isNumber(char c) const;
-
 		std::string json;
 
 		std::queue<Token> tokens;
