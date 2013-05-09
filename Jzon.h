@@ -412,8 +412,11 @@ namespace Jzon
 		void tokenize();
 		bool assemble();
 
-		void readString();
+		char peek();
+		void jumpToNext(char c);
+		void jumpToCommentEnd();
 
+		void readString();
 		bool interpretValue(const std::string &value);
 
 		std::string json;

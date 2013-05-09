@@ -918,9 +918,10 @@ namespace Jzon
 		std::string valueBuffer;
 		bool saveBuffer;
 
+		char c = '\0';
 		for (; cursor < json.size(); ++cursor)
 		{
-			char c = json.at(cursor);
+			c = json.at(cursor);
 
 			if (IsWhitespace(c))
 				continue;
@@ -963,6 +964,19 @@ namespace Jzon
 				{
 					token = T_VALUE;
 					readString();
+					break;
+				}
+			case '/' :
+				{
+					char p = peek();
+					if (p == '*')
+					{
+						jumpToCommentEnd();
+					}
+					else if (p == '/')
+					{
+						jumpToNext('\n');
+					}
 					break;
 				}
 			default :
@@ -1181,6 +1195,38 @@ namespace Jzon
 		return true;
 	}
 
+	char Parser::peek()
+	{
+		if (cursor < json.size()-1)
+		{
+			return json.at(cursor+1);
+		}
+		else
+		{
+			return '\0';
+		}
+	}
+	void Parser::jumpToNext(char c)
+	{
+		++cursor;
+		while (cursor < json.size() && json.at(cursor) != c)
+			++cursor;
+	}
+	void Parser::jumpToCommentEnd()
+	{
+		++cursor;
+		char c1 = '\0', c2 = '\0';
+		for (; cursor < json.size(); ++cursor)
+		{
+			c2 = json.at(cursor);
+
+			if (c1 == '*' && c2 == '/')
+				break;
+
+			c1 = c2;
+		}
+	}
+
 	void Parser::readString()
 	{
 		if (json.at(cursor) != '"')
@@ -1190,10 +1236,10 @@ namespace Jzon
 
 		++cursor;
 
-		char c1 = '\0';
+		char c1 = '\0', c2 = '\0';
 		for (; cursor < json.size(); ++cursor)
 		{
-			char c2 = json.at(cursor);
+			c2 = json.at(cursor);
 
 			if (c1 != '\\' && c2 == '"')
 			{
@@ -1207,7 +1253,6 @@ namespace Jzon
 
 		data.push(std::make_pair(Value::VT_STRING, str));
 	}
-
 	bool Parser::interpretValue(const std::string &value)
 	{
 		std::string upperValue(value.size(), '\0');
