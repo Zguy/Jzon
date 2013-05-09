@@ -380,6 +380,7 @@ namespace Jzon
 
 		const Node &root;
 
+		// Disable assignment operator
 		Writer &operator=(const Writer&);
 	};
 
