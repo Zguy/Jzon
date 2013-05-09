@@ -874,10 +874,11 @@ namespace Jzon
 	{
 		fi->SetFormat(format);
 	}
-	void Writer::Write()
+	const std::string &Writer::Write()
 	{
 		result.clear();
 		writeNode(root, 0);
+		return result;
 	}
 
 	const std::string &Writer::GetResult() const

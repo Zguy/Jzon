@@ -363,8 +363,9 @@ namespace Jzon
 		~Writer();
 
 		void SetFormat(const Format &format);
-		void Write();
+		const std::string &Write();
 
+		// Return result from last call to Write()
 		const std::string &GetResult() const;
 
 	private:
@@ -427,6 +428,7 @@ namespace Jzon
 
 		std::string error;
 
+		// Disable assignment operator
 		Parser &operator=(const Parser&);
 	};
 }
