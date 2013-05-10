@@ -59,7 +59,7 @@ namespace Jzon
 				return std::string(format.indentSize * level, indentationChar);
 			}
 		}
-		
+
 		inline const std::string &GetNewline() const
 		{
 			return newline;
@@ -138,7 +138,7 @@ namespace Jzon
 	Node::Type Node::DetermineType(const std::string &json)
 	{
 		std::string::const_iterator jsonIt = json.begin();
-		
+
 		while (jsonIt != json.end() && IsWhitespace(*jsonIt))
 			++jsonIt;
 
@@ -595,7 +595,7 @@ namespace Jzon
 				return *(*it).second;
 			}
 		}
-		
+
 		throw NotFoundException();
 	}
 
@@ -886,7 +886,7 @@ namespace Jzon
 	Parser::Parser(Node &root) : root(root)
 	{
 	}
-	Parser::Parser(Node &root, const std::string &json) : root(root), json(json)
+	Parser::Parser(Node &root, const std::string &json) : json(json), root(root)
 	{
 	}
 	Parser::~Parser()
