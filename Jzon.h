@@ -36,17 +36,11 @@ namespace Jzon
 	class Array;
 	typedef std::pair<std::string, Node&> NamedNode;
 	typedef std::pair<std::string, Node*> NamedNodePtr;
-	
+
 	class TypeException : public std::logic_error
 	{
 	public:
 		TypeException() : std::logic_error("A Node was used as the wrong type")
-		{}
-	};
-	class ValueException : public std::logic_error
-	{
-	public:
-		ValueException() : std::logic_error("A Value was used as the wrong type")
 		{}
 	};
 	class NotFoundException : public std::out_of_range

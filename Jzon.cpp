@@ -211,70 +211,66 @@ namespace Jzon
 	std::string Value::ToString() const
 	{
 		if (IsNull())
+		{
 			return "null";
+		}
 		else
+		{
 			return valueStr;
+		}
 	}
 	int Value::ToInt() const
 	{
-		if (IsNull())
-			return 0;
+		if (IsNumber())
+		{
+			std::stringstream sstr(valueStr);
+			int val;
+			sstr >> val;
+			return val;
+		}
 		else
 		{
-			if (IsNumber())
-			{
-				std::stringstream sstr(valueStr);
-				int val;
-				sstr >> val;
-				return val;
-			}
-			else
-				throw ValueException();
+			return 0;
 		}
 	}
 	float Value::ToFloat() const
 	{
-		if (IsNull())
-			return 0.0;
+		if (IsNumber())
+		{
+			std::stringstream sstr(valueStr);
+			float val;
+			sstr >> val;
+			return val;
+		}
 		else
 		{
-			if (IsNumber())
-			{
-				std::stringstream sstr(valueStr);
-				float val;
-				sstr >> val;
-				return val;
-			}
-			else
-				throw ValueException();
+			return 0.f;
 		}
 	}
 	double Value::ToDouble() const
 	{
-		if (IsNull())
-			return 0.0;
+		if (IsNumber())
+		{
+			std::stringstream sstr(valueStr);
+			double val;
+			sstr >> val;
+			return val;
+		}
 		else
 		{
-			if (IsNumber())
-			{
-				std::stringstream sstr(valueStr);
-				double val;
-				sstr >> val;
-				return val;
-			}
-			else
-				throw ValueException();
+			return 0.0;
 		}
 	}
 	bool Value::ToBool() const
 	{
-		if (IsNull())
-			return false;
+		if (IsBool())
+		{
+			return (valueStr == "true");
+		}
 		else
-			if (IsBool())
-				return (valueStr == "true");
-			else
-				throw ValueException();
+		{
+			return false;
+		}
 	}
 
 	void Value::SetNull()
