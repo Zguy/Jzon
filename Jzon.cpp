@@ -154,15 +154,15 @@ namespace Jzon
 	}
 
 
-	Value::Value()
+	Value::Value() : Node()
 	{
 		SetNull();
 	}
-	Value::Value(const Value &rhs)
+	Value::Value(const Value &rhs) : Node()
 	{
 		Set(rhs);
 	}
-	Value::Value(const Node &rhs)
+	Value::Value(const Node &rhs) : Node()
 	{
 		const Value &value = rhs.AsValue();
 		Set(value);
@@ -473,10 +473,10 @@ namespace Jzon
 	}
 
 
-	Object::Object()
+	Object::Object() : Node()
 	{
 	}
-	Object::Object(const Object &other)
+	Object::Object(const Object &other) : Node()
 	{
 		for (ChildList::const_iterator it = other.children.begin(); it != other.children.end(); ++it)
 		{
@@ -486,7 +486,7 @@ namespace Jzon
 			children.push_back(std::make_pair(name, value.GetCopy()));
 		}
 	}
-	Object::Object(const Node &other)
+	Object::Object(const Node &other) : Node()
 	{
 		const Object &object = other.AsObject();
 
@@ -601,10 +601,10 @@ namespace Jzon
 	}
 
 
-	Array::Array()
+	Array::Array() : Node()
 	{
 	}
-	Array::Array(const Array &other)
+	Array::Array(const Array &other) : Node()
 	{
 		for (ChildList::const_iterator it = other.children.begin(); it != other.children.end(); ++it)
 		{
@@ -613,7 +613,7 @@ namespace Jzon
 			children.push_back(value.GetCopy());
 		}
 	}
-	Array::Array(const Node &other)
+	Array::Array(const Node &other) : Node()
 	{
 		const Array &array = other.AsArray();
 
