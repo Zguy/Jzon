@@ -483,7 +483,7 @@ namespace Jzon
 			const std::string &name = (*it).first;
 			Node &value = *(*it).second;
 
-			children.push_back(std::make_pair(name, value.GetCopy()));
+			children.push_back(NamedNodePtr(name, value.GetCopy()));
 		}
 	}
 	Object::Object(const Node &other) : Node()
@@ -495,7 +495,7 @@ namespace Jzon
 			const std::string &name = (*it).first;
 			Node &value = *(*it).second;
 
-			children.push_back(std::make_pair(name, value.GetCopy()));
+			children.push_back(NamedNodePtr(name, value.GetCopy()));
 		}
 	}
 	Object::~Object()
@@ -510,11 +510,11 @@ namespace Jzon
 
 	void Object::Add(const std::string &name, Node &node)
 	{
-		children.push_back(std::make_pair(name, node.GetCopy()));
+		children.push_back(NamedNodePtr(name, node.GetCopy()));
 	}
 	void Object::Add(const std::string &name, Value node)
 	{
-		children.push_back(std::make_pair(name, new Value(node)));
+		children.push_back(NamedNodePtr(name, new Value(node)));
 	}
 	void Object::Remove(const std::string &name)
 	{
@@ -992,7 +992,7 @@ namespace Jzon
 				else
 				{
 					// Store the unknown token, so we can show it to the user
-					data.push(std::make_pair(Value::VT_STRING, valueBuffer));
+					data.push(MakePair(Value::VT_STRING, valueBuffer));
 					tokens.push(T_UNKNOWN);
 				}
 
@@ -1013,7 +1013,7 @@ namespace Jzon
 	}
 	bool Parser::assemble()
 	{
-		std::stack<std::pair<std::string, Node*> > nodeStack;
+		std::stack<Pair<std::string, Node*> > nodeStack;
 
 		std::string name = "";
 
@@ -1050,7 +1050,7 @@ namespace Jzon
 						node = new Object;
 					}
 
-					nodeStack.push(std::make_pair(name, node));
+					nodeStack.push(MakePair(name, node));
 					name.clear();
 					break;
 				}
@@ -1072,7 +1072,7 @@ namespace Jzon
 						node = new Array;
 					}
 
-					nodeStack.push(std::make_pair(name, node));
+					nodeStack.push(MakePair(name, node));
 					name.clear();
 					break;
 				}
@@ -1177,7 +1177,7 @@ namespace Jzon
 						}
 						else
 						{
-							nodeStack.push(std::make_pair(name, node));
+							nodeStack.push(MakePair(name, node));
 							name.clear();
 						}
 					}
@@ -1247,7 +1247,7 @@ namespace Jzon
 			c1 = c2;
 		}
 
-		data.push(std::make_pair(Value::VT_STRING, str));
+		data.push(MakePair(Value::VT_STRING, str));
 	}
 	bool Parser::interpretValue(const std::string &value)
 	{
@@ -1257,15 +1257,15 @@ namespace Jzon
 
 		if (upperValue == "NULL")
 		{
-			data.push(std::make_pair(Value::VT_NULL, ""));
+			data.push(MakePair(Value::VT_NULL, std::string("")));
 		}
 		else if (upperValue == "TRUE")
 		{
-			data.push(std::make_pair(Value::VT_BOOL, "true"));
+			data.push(MakePair(Value::VT_BOOL, std::string("true")));
 		}
 		else if (upperValue == "FALSE")
 		{
-			data.push(std::make_pair(Value::VT_BOOL, "false"));
+			data.push(MakePair(Value::VT_BOOL, std::string("false")));
 		}
 		else
 		{
@@ -1281,7 +1281,7 @@ namespace Jzon
 
 			if (number)
 			{
-				data.push(std::make_pair(Value::VT_NUMBER, value));
+				data.push(MakePair(Value::VT_NUMBER, value));
 			}
 			else
 			{
