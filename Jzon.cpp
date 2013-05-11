@@ -882,8 +882,9 @@ namespace Jzon
 	Parser::Parser(Node &root) : root(root)
 	{
 	}
-	Parser::Parser(Node &root, const std::string &json) : json(json), root(root)
+	Parser::Parser(Node &root, const std::string &json) : root(root)
 	{
+		SetJson(json);
 	}
 	Parser::~Parser()
 	{
@@ -892,6 +893,7 @@ namespace Jzon
 	void Parser::SetJson(const std::string &json)
 	{
 		this->json = json;
+		jsonSize   = json.size();
 	}
 	bool Parser::Parse()
 	{
@@ -915,7 +917,7 @@ namespace Jzon
 		bool saveBuffer;
 
 		char c = '\0';
-		for (; cursor < json.size(); ++cursor)
+		for (; cursor < jsonSize; ++cursor)
 		{
 			c = json.at(cursor);
 
@@ -983,7 +985,7 @@ namespace Jzon
 				}
 			}
 
-			if ((saveBuffer || cursor == json.size()-1) && (!valueBuffer.empty())) // Always save buffer on the last character
+			if ((saveBuffer || cursor == jsonSize-1) && (!valueBuffer.empty())) // Always save buffer on the last character
 			{
 				if (interpretValue(valueBuffer))
 				{
@@ -1193,7 +1195,7 @@ namespace Jzon
 
 	char Parser::peek()
 	{
-		if (cursor < json.size()-1)
+		if (cursor < jsonSize-1)
 		{
 			return json.at(cursor+1);
 		}
@@ -1205,14 +1207,14 @@ namespace Jzon
 	void Parser::jumpToNext(char c)
 	{
 		++cursor;
-		while (cursor < json.size() && json.at(cursor) != c)
+		while (cursor < jsonSize && json.at(cursor) != c)
 			++cursor;
 	}
 	void Parser::jumpToCommentEnd()
 	{
 		++cursor;
 		char c1 = '\0', c2 = '\0';
-		for (; cursor < json.size(); ++cursor)
+		for (; cursor < jsonSize; ++cursor)
 		{
 			c2 = json.at(cursor);
 
@@ -1233,7 +1235,7 @@ namespace Jzon
 		++cursor;
 
 		char c1 = '\0', c2 = '\0';
-		for (; cursor < json.size(); ++cursor)
+		for (; cursor < jsonSize; ++cursor)
 		{
 			c2 = json.at(cursor);
 

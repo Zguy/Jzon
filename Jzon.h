@@ -441,11 +441,12 @@ namespace Jzon
 		bool interpretValue(const std::string &value);
 
 		std::string json;
+		std::size_t jsonSize;
 
 		std::queue<Token> tokens;
 		std::queue<Pair<Value::ValueType, std::string> > data;
 
-		unsigned int cursor;
+		std::size_t cursor;
 
 		Node &root;
 
