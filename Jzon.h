@@ -35,6 +35,8 @@ namespace Jzon
 	{
 		Pair(T1 first, T2 second) : first(first), second(second)
 		{}
+		Pair(const Pair<T1,T2> &other) : first(other.first), second(other.second)
+		{}
 
 		Pair &operator=(const Pair &rhs)
 		{
