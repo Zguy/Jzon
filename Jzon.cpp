@@ -1223,7 +1223,7 @@ namespace Jzon
 	}
 	void Parser::jumpToCommentEnd()
 	{
-		++cursor;
+		cursor += 2;
 		char c1 = '\0', c2 = '\0';
 		for (; cursor < jsonSize; ++cursor)
 		{
