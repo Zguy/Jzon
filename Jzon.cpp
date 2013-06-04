@@ -1128,17 +1128,24 @@ namespace Jzon
 				}
 			case T_VALUE :
 				{
+					if (data.empty())
+					{
+						error = "Missing data for value";
+						return false;
+					}
+
+					const Pair<Value::ValueType, std::string> &dataPair = data.front();
 					if (!tokens.empty() && tokens.front() == T_SEPARATOR_NAME)
 					{
 						tokens.pop();
-						if (data.front().first != Value::VT_STRING)
+						if (dataPair.first != Value::VT_STRING)
 						{
 							error = "A name has to be a string";
 							return false;
 						}
 						else
 						{
-							name = data.front().second;
+							name = dataPair.second;
 							data.pop();
 						}
 					}
@@ -1160,13 +1167,13 @@ namespace Jzon
 							node = new Value;
 						}
 
-						if (data.front().first == Value::VT_STRING)
+						if (dataPair.first == Value::VT_STRING)
 						{
-							static_cast<Value*>(node)->Set(data.front().second); // This method calls UnescapeString()
+							node->AsValue().Set(dataPair.second); // This method calls UnescapeString()
 						}
 						else
 						{
-							static_cast<Value*>(node)->Set(data.front().first, data.front().second);
+							node->AsValue().Set(dataPair.first, dataPair.second);
 						}
 						data.pop();
 
