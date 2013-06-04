@@ -970,12 +970,16 @@ namespace Jzon
 					if (p == '*')
 					{
 						jumpToCommentEnd();
+						saveBuffer = false;
+						break;
 					}
 					else if (p == '/')
 					{
 						jumpToNext('\n');
+						saveBuffer = false;
+						break;
 					}
-					break;
+					// Intentional fallthrough
 				}
 			default :
 				{
