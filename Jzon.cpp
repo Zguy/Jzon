@@ -756,8 +756,8 @@ namespace Jzon
 		if (!error.empty())
 			return false;
 
-		Parser parser(node, json);
-		if (!parser.Parse())
+		Parser parser(json);
+		if (!parser.Parse(node))
 		{
 			error = parser.GetError();
 			return false;
@@ -879,10 +879,10 @@ namespace Jzon
 	}
 
 
-	Parser::Parser(Node &root) : jsonSize(0), cursor(0), root(root)
+	Parser::Parser() : jsonSize(0), cursor(0), root(NULL)
 	{
 	}
-	Parser::Parser(Node &root, const std::string &json) : cursor(0), root(root)
+	Parser::Parser(const std::string &json) : cursor(0), root(NULL)
 	{
 		SetJson(json);
 	}
@@ -895,13 +895,15 @@ namespace Jzon
 		this->json = json;
 		jsonSize   = json.size();
 	}
-	bool Parser::Parse()
+	bool Parser::Parse(Node &root)
 	{
+		this->root = &root;
 		cursor = 0;
 
 		tokenize();
 		bool success = assemble();
 
+		this->root = NULL;
 		return success;
 	}
 
@@ -1043,13 +1045,13 @@ namespace Jzon
 					Node *node = NULL;
 					if (nodeStack.empty())
 					{
-						if (!root.IsObject())
+						if (!root->IsObject())
 						{
 							error = "The given root node is not an object";
 							return false;
 						}
 
-						node = &root;
+						node = root;
 					}
 					else
 					{
@@ -1065,13 +1067,13 @@ namespace Jzon
 					Node *node = NULL;
 					if (nodeStack.empty())
 					{
-						if (!root.IsArray())
+						if (!root->IsArray())
 						{
 							error = "The given root node is not an array";
 							return false;
 						}
 
-						node = &root;
+						node = root;
 					}
 					else
 					{
@@ -1154,13 +1156,13 @@ namespace Jzon
 						Node *node = NULL;
 						if (nodeStack.empty())
 						{
-							if (!root.IsValue())
+							if (!root->IsValue())
 							{
 								error = "The given root node is not a value";
 								return false;
 							}
 
-							node = &root;
+							node = root;
 						}
 						else
 						{

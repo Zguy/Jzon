@@ -411,12 +411,12 @@ namespace Jzon
 	class Parser
 	{
 	public:
-		Parser(Node &root);
-		Parser(Node &root, const std::string &json);
+		Parser();
+		Parser(const std::string &json);
 		~Parser();
 
 		void SetJson(const std::string &json);
-		bool Parse();
+		bool Parse(Node &root);
 
 		const std::string &GetError() const;
 
@@ -451,7 +451,7 @@ namespace Jzon
 
 		std::size_t cursor;
 
-		Node &root;
+		Node *root;
 
 		std::string error;
 
