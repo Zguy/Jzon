@@ -38,7 +38,7 @@ namespace Jzon
 		Pair(const Pair<T1,T2> &other) : first(other.first), second(other.second)
 		{}
 
-		Pair &operator=(const Pair &rhs)
+		Pair<T1,T2> &operator=(const Pair<T1,T2> &rhs)
 		{
 			if (this != &rhs)
 			{
@@ -52,9 +52,9 @@ namespace Jzon
 		T2 second;
 	};
 	template<typename T1, typename T2>
-	static Pair<T1, T2> MakePair(T1 first, T2 second)
+	static Pair<T1,T2> MakePair(T1 first, T2 second)
 	{
-		return Pair<T1, T2>(first, second);
+		return Pair<T1,T2>(first, second);
 	}
 
 	class Node;
@@ -89,6 +89,7 @@ namespace Jzon
 
 	class Node
 	{
+		// These are needed for GetCopy() access
 		friend class Object;
 		friend class Array;
 
@@ -388,7 +389,7 @@ namespace Jzon
 		void SetFormat(const Format &format);
 		const std::string &Write();
 
-		// Return result from last call to Write()
+		/// Return result from last call to Write()
 		const std::string &GetResult() const;
 
 	private:
