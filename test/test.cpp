@@ -17,15 +17,15 @@ int main(int argc, char **argv)
 	Jzon::Node *node;
 	switch (readr.DetermineType())
 	{
-	case Jzon::Node::Type::T_ARRAY:
+	case Jzon::Node::T_ARRAY:
 		node = new Jzon::Array;
 		// std::cout << "It's an array!" << std::endl;
 		break;
-	case Jzon::Node::Type::T_OBJECT:
+	case Jzon::Node::T_OBJECT:
 		node = new Jzon::Object;
 		// std::cout << "It's an object!" << std::endl;
 		break;
-	case Jzon::Node::Type::T_VALUE:
+	case Jzon::Node::T_VALUE:
 		node = new Jzon::Value;
 		// std::cout << "It's a value!" << std::endl;
 		break;
