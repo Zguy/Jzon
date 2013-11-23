@@ -24,9 +24,9 @@ touch $outfile
 
 failure=false
 
-run_success 1;
-run_success 2;
-run_success 3;
+for i in $(seq 1 3); do
+	run_success $i
+done
 
 
 rm $outfile
