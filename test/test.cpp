@@ -1,43 +1,47 @@
-#include <iostream>
 #include "../Jzon.h"
+
+#include <iostream>
 
 int main(int argc, char **argv)
 {
-	if (argc != 2) {
+	if (argc != 2)
+	{
 		std::cerr << "Expecting 1 argument - a file name" << std::endl;
 		return 1;
 	}
-	std::string fname(argv[1]);
-	Jzon::FileReader readr(fname);
-	std::string const err = readr.GetError();
-	if (!err.empty()) {
-		std::cerr << err << std::endl;
+
+	std::string filename(argv[1]);
+	Jzon::FileReader reader(filename);
+	const std::string &error = reader.GetError();
+	if (!error.empty())
+	{
+		std::cerr << error << std::endl;
 		return 1;
 	}
-	Jzon::Node *node;
-	switch (readr.DetermineType())
+
+	Jzon::Node *node = NULL;
+	switch (reader.DetermineType())
 	{
 	case Jzon::Node::T_ARRAY:
 		node = new Jzon::Array;
-		// std::cout << "It's an array!" << std::endl;
 		break;
 	case Jzon::Node::T_OBJECT:
 		node = new Jzon::Object;
-		// std::cout << "It's an object!" << std::endl;
 		break;
 	case Jzon::Node::T_VALUE:
 		node = new Jzon::Value;
-		// std::cout << "It's a value!" << std::endl;
 		break;
 	default:
 		std::cerr << "Sanity check fail" << std::endl;
 		return 1;
 	}
-	bool res = readr.Read(*node);
-	if (!res) {
-		std::cerr << readr.GetError() << std::endl;
+
+	bool result = reader.Read(*node);
+	if (!result)
+	{
+		std::cerr << reader.GetError() << std::endl;
 		return 1;
 	}
-	// std::cout << "It worked!" << std::endl;
+
 	return 0;
 }
