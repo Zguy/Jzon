@@ -29,6 +29,20 @@ THE SOFTWARE.
 #include <istream>
 #include <ostream>
 
+#ifndef JZON_API
+#	ifdef JZON_DLL
+#		if defined _WIN32 || defined __CYGWIN__
+#			define JZON_API __declspec(dllimport)
+#		elif __GNUC__ >= 4
+#			define JZON_API __attribute__ ((visibility ("default")))
+#		else
+#			define JZON_API
+#		endif
+#	else
+#		define JZON_API
+#	endif
+#endif
+
 namespace Jzon
 {
 	namespace Version
@@ -40,7 +54,7 @@ namespace Jzon
 	class Node;
 	typedef std::pair<std::string, Node> NamedNode;
 
-	class Node
+	class JZON_API Node
 	{
 	public:
 		class iterator : public std::iterator<std::input_iterator_tag, NamedNode>
@@ -183,7 +197,7 @@ namespace Jzon
 	Node object();
 	Node array();
 
-	struct Format
+	struct JZON_API Format
 	{
 		bool newline;
 		bool spacing;
@@ -193,7 +207,7 @@ namespace Jzon
 	const Format StandardFormat = { true, true, true, 1 };
 	const Format NoFormat = { false, false, false, 0 };
 
-	class Writer
+	class JZON_API Writer
 	{
 	public:
 		explicit Writer(const Format &format = NoFormat);
@@ -219,7 +233,7 @@ namespace Jzon
 		std::string spacing;
 	};
 
-	class Parser
+	class JZON_API Parser
 	{
 	public:
 		Parser();

@@ -19,6 +19,12 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
+#ifdef JZON_DLL
+#	if defined _WIN32 || defined __CYGWIN__
+#		define JZON_API __declspec(dllexport)
+#	endif
+#endif
+
 #include "Jzon.h"
 
 #include <sstream>
