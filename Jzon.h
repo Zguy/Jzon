@@ -58,7 +58,7 @@ namespace Jzon
 		T2 second;
 	};
 	template<typename T1, typename T2>
-	static Pair<T1,T2> MakePair(T1 first, T2 second)
+	static Pair<T1,T2> makePair(T1 first, T2 second)
 	{
 		return Pair<T1,T2>(first, second);
 	}
@@ -95,7 +95,7 @@ namespace Jzon
 
 	class Node
 	{
-		// These are needed for GetCopy() access
+		// These are needed for getCopy() access
 		friend class Object;
 		friend class Array;
 
@@ -110,39 +110,39 @@ namespace Jzon
 		Node();
 		virtual ~Node();
 
-		virtual Type GetType() const = 0;
+		virtual Type getType() const = 0;
 
-		inline bool IsObject() const { return (GetType() == T_OBJECT); }
-		inline bool IsArray() const { return (GetType() == T_ARRAY); }
-		inline bool IsValue() const { return (GetType() == T_VALUE); }
+		inline bool isObject() const { return (getType() == T_OBJECT); }
+		inline bool isArray() const { return (getType() == T_ARRAY); }
+		inline bool isValue() const { return (getType() == T_VALUE); }
 
-		Object &AsObject();
-		const Object &AsObject() const;
-		Array &AsArray();
-		const Array &AsArray() const;
-		Value &AsValue();
-		const Value &AsValue() const;
+		Object &asObject();
+		const Object &asObject() const;
+		Array &asArray();
+		const Array &asArray() const;
+		Value &asValue();
+		const Value &asValue() const;
 
-		virtual inline bool IsNull() const { return false; }
-		virtual inline bool IsString() const { return false; }
-		virtual inline bool IsNumber() const { return false; }
-		virtual inline bool IsBool() const { return false; }
+		virtual inline bool isNull() const { return false; }
+		virtual inline bool isString() const { return false; }
+		virtual inline bool isNumber() const { return false; }
+		virtual inline bool isBool() const { return false; }
 
-		virtual std::string ToString() const { throw TypeException(); }
-		virtual int ToInt() const { throw TypeException(); }
-		virtual float ToFloat() const { throw TypeException(); }
-		virtual double ToDouble() const { throw TypeException(); }
-		virtual bool ToBool() const { throw TypeException(); }
+		virtual std::string toString() const { throw TypeException(); }
+		virtual int toInt() const { throw TypeException(); }
+		virtual float toFloat() const { throw TypeException(); }
+		virtual double toDouble() const { throw TypeException(); }
+		virtual bool toBool() const { throw TypeException(); }
 
-		virtual bool Has(const std::string &/*name*/) const { throw TypeException(); }
-		virtual size_t GetCount() const { return 0; }
-		virtual Node &Get(const std::string &/*name*/) const { throw TypeException(); }
-		virtual Node &Get(size_t /*index*/) const { throw TypeException(); }
+		virtual bool has(const std::string &/*name*/) const { throw TypeException(); }
+		virtual size_t getCount() const { return 0; }
+		virtual Node &get(const std::string &/*name*/) const { throw TypeException(); }
+		virtual Node &get(size_t /*index*/) const { throw TypeException(); }
 
-		static Type DetermineType(const std::string &json);
+		static Type determineType(const std::string &json);
 
 	protected:
-		virtual Node *GetCopy() const = 0;
+		virtual Node *getCopy() const = 0;
 	};
 
 	class Value : public Node
@@ -168,29 +168,29 @@ namespace Jzon
 		Value(const bool value);
 		virtual ~Value();
 
-		virtual Type GetType() const;
-		ValueType GetValueType() const;
+		virtual Type getType() const;
+		ValueType getValueType() const;
 
-		virtual inline bool IsNull() const { return (type == VT_NULL); }
-		virtual inline bool IsString() const { return (type == VT_STRING); }
-		virtual inline bool IsNumber() const { return (type == VT_NUMBER); }
-		virtual inline bool IsBool() const { return (type == VT_BOOL); }
+		virtual inline bool isNull() const { return (type == VT_NULL); }
+		virtual inline bool isString() const { return (type == VT_STRING); }
+		virtual inline bool isNumber() const { return (type == VT_NUMBER); }
+		virtual inline bool isBool() const { return (type == VT_BOOL); }
 
-		virtual std::string ToString() const;
-		virtual int ToInt() const;
-		virtual float ToFloat() const;
-		virtual double ToDouble() const;
-		virtual bool ToBool() const;
+		virtual std::string toString() const;
+		virtual int toInt() const;
+		virtual float toFloat() const;
+		virtual double toDouble() const;
+		virtual bool toBool() const;
 
-		void SetNull();
-		void Set(const Value &value);
-		void Set(ValueType type, const std::string &value);
-		void Set(const std::string &value);
-		void Set(const char *value);
-		void Set(const int value);
-		void Set(const float value);
-		void Set(const double value);
-		void Set(const bool value);
+		void setNull();
+		void set(const Value &value);
+		void set(ValueType type, const std::string &value);
+		void set(const std::string &value);
+		void set(const char *value);
+		void set(const int value);
+		void set(const float value);
+		void set(const double value);
+		void set(const bool value);
 
 		Value &operator=(const Value &rhs);
 		Value &operator=(const Node &rhs);
@@ -204,11 +204,11 @@ namespace Jzon
 		bool operator==(const Value &other) const;
 		bool operator!=(const Value &other) const;
 
-		static std::string EscapeString(const std::string &value);
-		static std::string UnescapeString(const std::string &value);
+		static std::string escapeString(const std::string &value);
+		static std::string unescapeString(const std::string &value);
 
 	protected:
-		virtual Node *GetCopy() const;
+		virtual Node *getCopy() const;
 
 	private:
 		std::string valueStr;
@@ -260,25 +260,25 @@ namespace Jzon
 		Object(const Node &other);
 		virtual ~Object();
 
-		virtual Type GetType() const;
+		virtual Type getType() const;
 
-		void Add(const std::string &name, Node &node);
-		void Add(const std::string &name, Value node);
-		void Remove(const std::string &name);
-		void Clear();
+		void add(const std::string &name, Node &node);
+		void add(const std::string &name, Value node);
+		void remove(const std::string &name);
+		void clear();
 
 		iterator begin();
 		const_iterator begin() const;
 		iterator end();
 		const_iterator end() const;
 
-		virtual bool Has(const std::string &name) const;
-		virtual size_t GetCount() const;
-		virtual Node &Get(const std::string &name) const;
-		using Node::Get;
+		virtual bool has(const std::string &name) const;
+		virtual size_t getCount() const;
+		virtual Node &get(const std::string &name) const;
+		using Node::get;
 
 	protected:
-		virtual Node *GetCopy() const;
+		virtual Node *getCopy() const;
 
 	private:
 		typedef std::vector<NamedNodePtr> ChildList;
@@ -328,24 +328,24 @@ namespace Jzon
 		Array(const Node &other);
 		virtual ~Array();
 
-		virtual Type GetType() const;
+		virtual Type getType() const;
 
-		void Add(Node &node);
-		void Add(Value node);
-		void Remove(size_t index);
-		void Clear();
+		void add(Node &node);
+		void add(Value node);
+		void remove(size_t index);
+		void clear();
 
 		iterator begin();
 		const_iterator begin() const;
 		iterator end();
 		const_iterator end() const;
 
-		virtual size_t GetCount() const;
-		virtual Node &Get(size_t index) const;
-		using Node::Get;
+		virtual size_t getCount() const;
+		virtual Node &get(size_t index) const;
+		using Node::get;
 
 	protected:
-		virtual Node *GetCopy() const;
+		virtual Node *getCopy() const;
 
 	private:
 		typedef std::vector<Node*> ChildList;
@@ -358,9 +358,9 @@ namespace Jzon
 		FileWriter(const std::string &filename);
 		~FileWriter();
 
-		static void WriteFile(const std::string &filename, const Node &root, const Format &format = NoFormat);
+		static void writeFile(const std::string &filename, const Node &root, const Format &format = NoFormat);
 
-		void Write(const Node &root, const Format &format = NoFormat);
+		void write(const Node &root, const Format &format = NoFormat);
 
 	private:
 		std::string filename;
@@ -372,13 +372,13 @@ namespace Jzon
 		FileReader(const std::string &filename);
 		~FileReader();
 
-		static bool ReadFile(const std::string &filename, Node &node);
+		static bool readFile(const std::string &filename, Node &node);
 
-		bool Read(Node &node);
+		bool read(Node &node);
 
-		Node::Type DetermineType();
+		Node::Type determineType();
 
-		const std::string &GetError() const;
+		const std::string &getError() const;
 
 	private:
 		bool loadFile(const std::string &filename, std::string &json);
@@ -392,11 +392,11 @@ namespace Jzon
 		Writer(const Node &root, const Format &format = NoFormat);
 		~Writer();
 
-		void SetFormat(const Format &format);
-		const std::string &Write();
+		void setFormat(const Format &format);
+		const std::string &write();
 
-		/// Return result from last call to Write()
-		const std::string &GetResult() const;
+		/// Return result from last call to write()
+		const std::string &getResult() const;
 
 	private:
 		void writeNode(const Node &node, unsigned int level);
@@ -421,10 +421,10 @@ namespace Jzon
 		Parser(const std::string &json);
 		~Parser();
 
-		void SetJson(const std::string &json);
-		bool Parse(Node &root);
+		void setJson(const std::string &json);
+		bool parse(Node &root);
 
-		const std::string &GetError() const;
+		const std::string &getError() const;
 
 	private:
 		enum Token

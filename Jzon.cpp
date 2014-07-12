@@ -92,50 +92,50 @@ namespace Jzon
 	{
 	}
 
-	Object &Node::AsObject()
+	Object &Node::asObject()
 	{
-		if (IsObject())
+		if (isObject())
 			return static_cast<Object&>(*this);
 		else
 			throw TypeException();
 	}
-	const Object &Node::AsObject() const
+	const Object &Node::asObject() const
 	{
-		if (IsObject())
+		if (isObject())
 			return static_cast<const Object&>(*this);
 		else
 			throw TypeException();
 	}
-	Array &Node::AsArray()
+	Array &Node::asArray()
 	{
-		if (IsArray())
+		if (isArray())
 			return static_cast<Array&>(*this);
 		else
 			throw TypeException();
 	}
-	const Array &Node::AsArray() const
+	const Array &Node::asArray() const
 	{
-		if (IsArray())
+		if (isArray())
 			return static_cast<const Array&>(*this);
 		else
 			throw TypeException();
 	}
-	Value &Node::AsValue()
+	Value &Node::asValue()
 	{
-		if (IsValue())
+		if (isValue())
 			return static_cast<Value&>(*this);
 		else
 			throw TypeException();
 	}
-	const Value &Node::AsValue() const
+	const Value &Node::asValue() const
 	{
-		if (IsValue())
+		if (isValue())
 			return static_cast<const Value&>(*this);
 		else
 			throw TypeException();
 	}
 
-	Node::Type Node::DetermineType(const std::string &json)
+	Node::Type Node::determineType(const std::string &json)
 	{
 		std::string::const_iterator jsonIt = json.begin();
 
@@ -156,61 +156,61 @@ namespace Jzon
 
 	Value::Value() : Node()
 	{
-		SetNull();
+		setNull();
 	}
 	Value::Value(const Value &rhs) : Node()
 	{
-		Set(rhs);
+		set(rhs);
 	}
 	Value::Value(const Node &rhs) : Node()
 	{
-		const Value &value = rhs.AsValue();
-		Set(value);
+		const Value &value = rhs.asValue();
+		set(value);
 	}
 	Value::Value(ValueType type, const std::string &value)
 	{
-		Set(type, value);
+		set(type, value);
 	}
 	Value::Value(const std::string &value)
 	{
-		Set(value);
+		set(value);
 	}
 	Value::Value(const char *value)
 	{
-		Set(value);
+		set(value);
 	}
 	Value::Value(const int value)
 	{
-		Set(value);
+		set(value);
 	}
 	Value::Value(const float value)
 	{
-		Set(value);
+		set(value);
 	}
 	Value::Value(const double value)
 	{
-		Set(value);
+		set(value);
 	}
 	Value::Value(const bool value)
 	{
-		Set(value);
+		set(value);
 	}
 	Value::~Value()
 	{
 	}
 
-	Node::Type Value::GetType() const
+	Node::Type Value::getType() const
 	{
 		return T_VALUE;
 	}
-	Value::ValueType Value::GetValueType() const
+	Value::ValueType Value::getValueType() const
 	{
 		return type;
 	}
 
-	std::string Value::ToString() const
+	std::string Value::toString() const
 	{
-		if (IsNull())
+		if (isNull())
 		{
 			return "null";
 		}
@@ -219,9 +219,9 @@ namespace Jzon
 			return valueStr;
 		}
 	}
-	int Value::ToInt() const
+	int Value::toInt() const
 	{
-		if (IsNumber())
+		if (isNumber())
 		{
 			std::stringstream sstr(valueStr);
 			int val;
@@ -233,9 +233,9 @@ namespace Jzon
 			return 0;
 		}
 	}
-	float Value::ToFloat() const
+	float Value::toFloat() const
 	{
-		if (IsNumber())
+		if (isNumber())
 		{
 			std::stringstream sstr(valueStr);
 			float val;
@@ -247,9 +247,9 @@ namespace Jzon
 			return 0.f;
 		}
 	}
-	double Value::ToDouble() const
+	double Value::toDouble() const
 	{
-		if (IsNumber())
+		if (isNumber())
 		{
 			std::stringstream sstr(valueStr);
 			double val;
@@ -261,9 +261,9 @@ namespace Jzon
 			return 0.0;
 		}
 	}
-	bool Value::ToBool() const
+	bool Value::toBool() const
 	{
-		if (IsBool())
+		if (isBool())
 		{
 			return (valueStr == "true");
 		}
@@ -273,12 +273,12 @@ namespace Jzon
 		}
 	}
 
-	void Value::SetNull()
+	void Value::setNull()
 	{
 		valueStr = "";
 		type     = VT_NULL;
 	}
-	void Value::Set(const Value &value)
+	void Value::set(const Value &value)
 	{
 		if (this != &value)
 		{
@@ -286,43 +286,43 @@ namespace Jzon
 			type     = value.type;
 		}
 	}
-	void Value::Set(ValueType type, const std::string &value)
+	void Value::set(ValueType type, const std::string &value)
 	{
 		valueStr   = value;
 		this->type = type;
 	}
-	void Value::Set(const std::string &value)
+	void Value::set(const std::string &value)
 	{
-		valueStr = UnescapeString(value);
+		valueStr = unescapeString(value);
 		type     = VT_STRING;
 	}
-	void Value::Set(const char *value)
+	void Value::set(const char *value)
 	{
-		valueStr = UnescapeString(std::string(value));
+		valueStr = unescapeString(std::string(value));
 		type     = VT_STRING;
 	}
-	void Value::Set(const int value)
+	void Value::set(const int value)
 	{
 		std::stringstream sstr;
 		sstr << value;
 		valueStr = sstr.str();
 		type     = VT_NUMBER;
 	}
-	void Value::Set(const float value)
+	void Value::set(const float value)
 	{
 		std::stringstream sstr;
 		sstr << value;
 		valueStr = sstr.str();
 		type     = VT_NUMBER;
 	}
-	void Value::Set(const double value)
+	void Value::set(const double value)
 	{
 		std::stringstream sstr;
 		sstr << value;
 		valueStr = sstr.str();
 		type     = VT_NUMBER;
 	}
-	void Value::Set(const bool value)
+	void Value::set(const bool value)
 	{
 		if (value)
 			valueStr = "true";
@@ -334,43 +334,43 @@ namespace Jzon
 	Value &Value::operator=(const Value &rhs)
 	{
 		if (this != &rhs)
-			Set(rhs);
+			set(rhs);
 		return *this;
 	}
 	Value &Value::operator=(const Node &rhs)
 	{
 		if (this != &rhs)
-			Set(rhs.AsValue());
+			set(rhs.asValue());
 		return *this;
 	}
 	Value &Value::operator=(const std::string &rhs)
 	{
-		Set(rhs);
+		set(rhs);
 		return *this;
 	}
 	Value &Value::operator=(const char *rhs)
 	{
-		Set(rhs);
+		set(rhs);
 		return *this;
 	}
 	Value &Value::operator=(const int rhs)
 	{
-		Set(rhs);
+		set(rhs);
 		return *this;
 	}
 	Value &Value::operator=(const float rhs)
 	{
-		Set(rhs);
+		set(rhs);
 		return *this;
 	}
 	Value &Value::operator=(const double rhs)
 	{
-		Set(rhs);
+		set(rhs);
 		return *this;
 	}
 	Value &Value::operator=(const bool rhs)
 	{
-		Set(rhs);
+		set(rhs);
 		return *this;
 	}
 
@@ -383,7 +383,7 @@ namespace Jzon
 		return !(*this == other);
 	}
 
-	Node *Value::GetCopy() const
+	Node *Value::getCopy() const
 	{
 		return new Value(*this);
 	}
@@ -423,7 +423,7 @@ namespace Jzon
 		return nullUnescaped;
 	}
 
-	std::string Value::EscapeString(const std::string &value)
+	std::string Value::escapeString(const std::string &value)
 	{
 		std::string escaped;
 
@@ -445,7 +445,7 @@ namespace Jzon
 
 		return escaped;
 	}
-	std::string Value::UnescapeString(const std::string &value)
+	std::string Value::unescapeString(const std::string &value)
 	{
 		std::string unescaped;
 
@@ -483,40 +483,40 @@ namespace Jzon
 			const std::string &name = (*it).first;
 			Node &value = *(*it).second;
 
-			children.push_back(NamedNodePtr(name, value.GetCopy()));
+			children.push_back(NamedNodePtr(name, value.getCopy()));
 		}
 	}
 	Object::Object(const Node &other) : Node()
 	{
-		const Object &object = other.AsObject();
+		const Object &object = other.asObject();
 
 		for (ChildList::const_iterator it = object.children.begin(); it != object.children.end(); ++it)
 		{
 			const std::string &name = (*it).first;
 			Node &value = *(*it).second;
 
-			children.push_back(NamedNodePtr(name, value.GetCopy()));
+			children.push_back(NamedNodePtr(name, value.getCopy()));
 		}
 	}
 	Object::~Object()
 	{
-		Clear();
+		clear();
 	}
 
-	Node::Type Object::GetType() const
+	Node::Type Object::getType() const
 	{
 		return T_OBJECT;
 	}
 
-	void Object::Add(const std::string &name, Node &node)
+	void Object::add(const std::string &name, Node &node)
 	{
-		children.push_back(NamedNodePtr(name, node.GetCopy()));
+		children.push_back(NamedNodePtr(name, node.getCopy()));
 	}
-	void Object::Add(const std::string &name, Value node)
+	void Object::add(const std::string &name, Value node)
 	{
 		children.push_back(NamedNodePtr(name, new Value(node)));
 	}
-	void Object::Remove(const std::string &name)
+	void Object::remove(const std::string &name)
 	{
 		for (ChildList::iterator it = children.begin(); it != children.end(); ++it)
 		{
@@ -528,7 +528,7 @@ namespace Jzon
 			}
 		}
 	}
-	void Object::Clear()
+	void Object::clear()
 	{
 		for (ChildList::iterator it = children.begin(); it != children.end(); ++it)
 		{
@@ -567,7 +567,7 @@ namespace Jzon
 			return Object::const_iterator(NULL);
 	}
 
-	bool Object::Has(const std::string &name) const
+	bool Object::has(const std::string &name) const
 	{
 		for (ChildList::const_iterator it = children.begin(); it != children.end(); ++it)
 		{
@@ -578,11 +578,11 @@ namespace Jzon
 		}
 		return false;
 	}
-	size_t Object::GetCount() const
+	size_t Object::getCount() const
 	{
 		return children.size();
 	}
-	Node &Object::Get(const std::string &name) const
+	Node &Object::get(const std::string &name) const
 	{
 		for (ChildList::const_iterator it = children.begin(); it != children.end(); ++it)
 		{
@@ -595,7 +595,7 @@ namespace Jzon
 		throw NotFoundException();
 	}
 
-	Node *Object::GetCopy() const
+	Node *Object::getCopy() const
 	{
 		return new Object(*this);
 	}
@@ -610,39 +610,39 @@ namespace Jzon
 		{
 			const Node &value = *(*it);
 
-			children.push_back(value.GetCopy());
+			children.push_back(value.getCopy());
 		}
 	}
 	Array::Array(const Node &other) : Node()
 	{
-		const Array &array = other.AsArray();
+		const Array &array = other.asArray();
 
 		for (ChildList::const_iterator it = array.children.begin(); it != array.children.end(); ++it)
 		{
 			const Node &value = *(*it);
 
-			children.push_back(value.GetCopy());
+			children.push_back(value.getCopy());
 		}
 	}
 	Array::~Array()
 	{
-		Clear();
+		clear();
 	}
 
-	Node::Type Array::GetType() const
+	Node::Type Array::getType() const
 	{
 		return T_ARRAY;
 	}
 
-	void Array::Add(Node &node)
+	void Array::add(Node &node)
 	{
-		children.push_back(node.GetCopy());
+		children.push_back(node.getCopy());
 	}
-	void Array::Add(Value node)
+	void Array::add(Value node)
 	{
 		children.push_back(new Value(node));
 	}
-	void Array::Remove(size_t index)
+	void Array::remove(size_t index)
 	{
 		if (index < children.size())
 		{
@@ -651,7 +651,7 @@ namespace Jzon
 			children.erase(it);
 		}
 	}
-	void Array::Clear()
+	void Array::clear()
 	{
 		for (ChildList::iterator it = children.begin(); it != children.end(); ++it)
 		{
@@ -690,11 +690,11 @@ namespace Jzon
 			return Array::const_iterator(NULL);
 	}
 
-	size_t Array::GetCount() const
+	size_t Array::getCount() const
 	{
 		return children.size();
 	}
-	Node &Array::Get(size_t index) const
+	Node &Array::get(size_t index) const
 	{
 		if (index < children.size())
 		{
@@ -704,7 +704,7 @@ namespace Jzon
 		throw NotFoundException();
 	}
 
-	Node *Array::GetCopy() const
+	Node *Array::getCopy() const
 	{
 		return new Array(*this);
 	}
@@ -717,19 +717,19 @@ namespace Jzon
 	{
 	}
 
-	void FileWriter::WriteFile(const std::string &filename, const Node &root, const Format &format)
+	void FileWriter::writeFile(const std::string &filename, const Node &root, const Format &format)
 	{
 		FileWriter writer(filename);
-		writer.Write(root, format);
+		writer.write(root, format);
 	}
 
-	void FileWriter::Write(const Node &root, const Format &format)
+	void FileWriter::write(const Node &root, const Format &format)
 	{
 		Writer writer(root, format);
-		writer.Write();
+		writer.write();
 
 		std::fstream file(filename.c_str(), std::ios::out | std::ios::trunc);
-		file << writer.GetResult();
+		file << writer.getResult();
 		file.close();
 	}
 
@@ -745,21 +745,21 @@ namespace Jzon
 	{
 	}
 
-	bool FileReader::ReadFile(const std::string &filename, Node &node)
+	bool FileReader::readFile(const std::string &filename, Node &node)
 	{
 		FileReader reader(filename);
-		return reader.Read(node);
+		return reader.read(node);
 	}
 
-	bool FileReader::Read(Node &node)
+	bool FileReader::read(Node &node)
 	{
 		if (!error.empty())
 			return false;
 
 		Parser parser(json);
-		if (!parser.Parse(node))
+		if (!parser.parse(node))
 		{
-			error = parser.GetError();
+			error = parser.getError();
 			return false;
 		}
 		else
@@ -768,12 +768,12 @@ namespace Jzon
 		}
 	}
 
-	Node::Type FileReader::DetermineType()
+	Node::Type FileReader::determineType()
 	{
-		return Node::DetermineType(json);
+		return Node::determineType(json);
 	}
 
-	const std::string &FileReader::GetError() const
+	const std::string &FileReader::getError() const
 	{
 		return error;
 	}
@@ -800,7 +800,7 @@ namespace Jzon
 
 	Writer::Writer(const Node &root, const Format &format) : fi(new FormatInterpreter), root(root)
 	{
-		SetFormat(format);
+		setFormat(format);
 	}
 	Writer::~Writer()
 	{
@@ -808,29 +808,29 @@ namespace Jzon
 		fi = NULL;
 	}
 
-	void Writer::SetFormat(const Format &format)
+	void Writer::setFormat(const Format &format)
 	{
 		fi->SetFormat(format);
 	}
-	const std::string &Writer::Write()
+	const std::string &Writer::write()
 	{
 		result.clear();
 		writeNode(root, 0);
 		return result;
 	}
 
-	const std::string &Writer::GetResult() const
+	const std::string &Writer::getResult() const
 	{
 		return result;
 	}
 
 	void Writer::writeNode(const Node &node, unsigned int level)
 	{
-		switch (node.GetType())
+		switch (node.getType())
 		{
-		case Node::T_OBJECT : writeObject(node.AsObject(), level); break;
-		case Node::T_ARRAY  : writeArray(node.AsArray(), level);   break;
-		case Node::T_VALUE  : writeValue(node.AsValue());          break;
+		case Node::T_OBJECT : writeObject(node.asObject(), level); break;
+		case Node::T_ARRAY  : writeArray(node.asArray(), level);   break;
+		case Node::T_VALUE  : writeValue(node.asValue());          break;
 		}
 	}
 	void Writer::writeObject(const Object &node, unsigned int level)
@@ -868,13 +868,13 @@ namespace Jzon
 	}
 	void Writer::writeValue(const Value &node)
 	{
-		if (node.IsString())
+		if (node.isString())
 		{
-			result += "\""+Value::EscapeString(node.ToString())+"\"";
+			result += "\""+Value::escapeString(node.toString())+"\"";
 		}
 		else
 		{
-			result += node.ToString();
+			result += node.toString();
 		}
 	}
 
@@ -884,18 +884,18 @@ namespace Jzon
 	}
 	Parser::Parser(const std::string &json) : cursor(0), root(NULL)
 	{
-		SetJson(json);
+		setJson(json);
 	}
 	Parser::~Parser()
 	{
 	}
 
-	void Parser::SetJson(const std::string &json)
+	void Parser::setJson(const std::string &json)
 	{
 		this->json = json;
 		jsonSize   = json.size();
 	}
-	bool Parser::Parse(Node &root)
+	bool Parser::parse(Node &root)
 	{
 		this->root = &root;
 		cursor = 0;
@@ -907,7 +907,7 @@ namespace Jzon
 		return success;
 	}
 
-	const std::string &Parser::GetError() const
+	const std::string &Parser::getError() const
 	{
 		return error;
 	}
@@ -1000,7 +1000,7 @@ namespace Jzon
 				else
 				{
 					// Store the unknown token, so we can show it to the user
-					data.push(MakePair(Value::VT_STRING, valueBuffer));
+					data.push(makePair(Value::VT_STRING, valueBuffer));
 					tokens.push(T_UNKNOWN);
 				}
 
@@ -1045,7 +1045,7 @@ namespace Jzon
 					Node *node = NULL;
 					if (nodeStack.empty())
 					{
-						if (!root->IsObject())
+						if (!root->isObject())
 						{
 							error = "The given root node is not an object";
 							return false;
@@ -1058,7 +1058,7 @@ namespace Jzon
 						node = new Object;
 					}
 
-					nodeStack.push(MakePair(name, node));
+					nodeStack.push(makePair(name, node));
 					name.clear();
 					break;
 				}
@@ -1067,7 +1067,7 @@ namespace Jzon
 					Node *node = NULL;
 					if (nodeStack.empty())
 					{
-						if (!root->IsArray())
+						if (!root->isArray())
 						{
 							error = "The given root node is not an array";
 							return false;
@@ -1080,7 +1080,7 @@ namespace Jzon
 						node = new Array;
 					}
 
-					nodeStack.push(MakePair(name, node));
+					nodeStack.push(makePair(name, node));
 					name.clear();
 					break;
 				}
@@ -1092,12 +1092,12 @@ namespace Jzon
 						error = "Found end of object or array without beginning";
 						return false;
 					}
-					if (token == T_OBJ_END && !nodeStack.top().second->IsObject())
+					if (token == T_OBJ_END && !nodeStack.top().second->isObject())
 					{
 						error = "Mismatched end and beginning of object";
 						return false;
 					}
-					if (token == T_ARRAY_END && !nodeStack.top().second->IsArray())
+					if (token == T_ARRAY_END && !nodeStack.top().second->isArray())
 					{
 						error = "Mismatched end and beginning of array";
 						return false;
@@ -1109,13 +1109,13 @@ namespace Jzon
 
 					if (!nodeStack.empty())
 					{
-						if (nodeStack.top().second->IsObject())
+						if (nodeStack.top().second->isObject())
 						{
-							nodeStack.top().second->AsObject().Add(name, *node);
+							nodeStack.top().second->asObject().add(name, *node);
 						}
-						else if (nodeStack.top().second->IsArray())
+						else if (nodeStack.top().second->isArray())
 						{
-							nodeStack.top().second->AsArray().Add(*node);
+							nodeStack.top().second->asArray().add(*node);
 						}
 						else
 						{
@@ -1156,7 +1156,7 @@ namespace Jzon
 						Node *node = NULL;
 						if (nodeStack.empty())
 						{
-							if (!root->IsValue())
+							if (!root->isValue())
 							{
 								error = "The given root node is not a value";
 								return false;
@@ -1171,20 +1171,20 @@ namespace Jzon
 
 						if (dataPair.first == Value::VT_STRING)
 						{
-							node->AsValue().Set(dataPair.second); // This method calls UnescapeString()
+							node->asValue().set(dataPair.second); // This method calls unescapeString()
 						}
 						else
 						{
-							node->AsValue().Set(dataPair.first, dataPair.second);
+							node->asValue().set(dataPair.first, dataPair.second);
 						}
 						data.pop();
 
 						if (!nodeStack.empty())
 						{
-							if (nodeStack.top().second->IsObject())
-								nodeStack.top().second->AsObject().Add(name, *node);
-							else if (nodeStack.top().second->IsArray())
-								nodeStack.top().second->AsArray().Add(*node);
+							if (nodeStack.top().second->isObject())
+								nodeStack.top().second->asObject().add(name, *node);
+							else if (nodeStack.top().second->isArray())
+								nodeStack.top().second->asArray().add(*node);
 
 							delete node;
 							node = NULL;
@@ -1192,7 +1192,7 @@ namespace Jzon
 						}
 						else
 						{
-							nodeStack.push(MakePair(name, node));
+							nodeStack.push(makePair(name, node));
 							name.clear();
 						}
 					}
@@ -1262,7 +1262,7 @@ namespace Jzon
 			c1 = c2;
 		}
 
-		data.push(MakePair(Value::VT_STRING, str));
+		data.push(makePair(Value::VT_STRING, str));
 	}
 	bool Parser::interpretValue(const std::string &value)
 	{
@@ -1272,15 +1272,15 @@ namespace Jzon
 
 		if (upperValue == "NULL")
 		{
-			data.push(MakePair(Value::VT_NULL, std::string("")));
+			data.push(makePair(Value::VT_NULL, std::string("")));
 		}
 		else if (upperValue == "TRUE")
 		{
-			data.push(MakePair(Value::VT_BOOL, std::string("true")));
+			data.push(makePair(Value::VT_BOOL, std::string("true")));
 		}
 		else if (upperValue == "FALSE")
 		{
-			data.push(MakePair(Value::VT_BOOL, std::string("false")));
+			data.push(makePair(Value::VT_BOOL, std::string("false")));
 		}
 		else
 		{
@@ -1296,7 +1296,7 @@ namespace Jzon
 
 			if (number)
 			{
-				data.push(MakePair(Value::VT_NUMBER, value));
+				data.push(makePair(Value::VT_NUMBER, value));
 			}
 			else
 			{
