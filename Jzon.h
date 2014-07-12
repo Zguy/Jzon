@@ -30,6 +30,12 @@ THE SOFTWARE.
 
 namespace Jzon
 {
+	namespace Version
+	{
+		static const int MAJOR = 2;
+		static const int MINOR = 1;
+	}
+
 	template<typename T1, typename T2>
 	struct Pair
 	{
