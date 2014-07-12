@@ -33,14 +33,14 @@ namespace Jzon
 	public:
 		FormatInterpreter()
 		{
-			SetFormat(NoFormat);
+			setFormat(NoFormat);
 		}
 		FormatInterpreter(const Format &format)
 		{
-			SetFormat(format);
+			setFormat(format);
 		}
 
-		void SetFormat(const Format &format)
+		void setFormat(const Format &format)
 		{
 			this->format = format;
 			indentationChar = (format.useTabs ? '\t' : ' ');
@@ -48,7 +48,7 @@ namespace Jzon
 			newline = (format.newline ? "\n" : spacing);
 		}
 
-		std::string GetIndentation(unsigned int level) const
+		std::string getIndentation(unsigned int level) const
 		{
 			if (!format.newline)
 			{
@@ -60,11 +60,11 @@ namespace Jzon
 			}
 		}
 
-		inline const std::string &GetNewline() const
+		inline const std::string &getNewline() const
 		{
 			return newline;
 		}
-		inline const std::string &GetSpacing() const
+		inline const std::string &getSpacing() const
 		{
 			return spacing;
 		}
@@ -76,11 +76,11 @@ namespace Jzon
 		std::string spacing;
 	};
 
-	inline bool IsWhitespace(char c)
+	inline bool isWhitespace(char c)
 	{
 		return (c == '\n' || c == ' ' || c == '\t' || c == '\r' || c == '\f');
 	}
-	inline bool IsNumber(char c)
+	inline bool isNumber(char c)
 	{
 		return ((c >= '0' && c <= '9') || c == '.' || c == '-');
 	}
@@ -139,7 +139,7 @@ namespace Jzon
 	{
 		std::string::const_iterator jsonIt = json.begin();
 
-		while (jsonIt != json.end() && IsWhitespace(*jsonIt))
+		while (jsonIt != json.end() && isWhitespace(*jsonIt))
 			++jsonIt;
 
 		if (jsonIt == json.end())
@@ -810,7 +810,7 @@ namespace Jzon
 
 	void Writer::setFormat(const Format &format)
 	{
-		fi->SetFormat(format);
+		fi->setFormat(format);
 	}
 	const std::string &Writer::write()
 	{
@@ -835,7 +835,7 @@ namespace Jzon
 	}
 	void Writer::writeObject(const Object &node, unsigned int level)
 	{
-		result += "{" + fi->GetNewline();
+		result += "{" + fi->getNewline();
 
 		for (Object::const_iterator it = node.begin(); it != node.end(); ++it)
 		{
@@ -843,28 +843,28 @@ namespace Jzon
 			const Node &value = (*it).second;
 
 			if (it != node.begin())
-				result += "," + fi->GetNewline();
-			result += fi->GetIndentation(level+1) + "\""+name+"\"" + ":" + fi->GetSpacing();
+				result += "," + fi->getNewline();
+			result += fi->getIndentation(level+1) + "\""+name+"\"" + ":" + fi->getSpacing();
 			writeNode(value, level+1);
 		}
 
-		result += fi->GetNewline() + fi->GetIndentation(level) + "}";
+		result += fi->getNewline() + fi->getIndentation(level) + "}";
 	}
 	void Writer::writeArray(const Array &node, unsigned int level)
 	{
-		result += "[" + fi->GetNewline();
+		result += "[" + fi->getNewline();
 
 		for (Array::const_iterator it = node.begin(); it != node.end(); ++it)
 		{
 			const Node &value = (*it);
 
 			if (it != node.begin())
-				result += "," + fi->GetNewline();
-			result += fi->GetIndentation(level+1);
+				result += "," + fi->getNewline();
+			result += fi->getIndentation(level+1);
 			writeNode(value, level+1);
 		}
 
-		result += fi->GetNewline() + fi->GetIndentation(level) + "]";
+		result += fi->getNewline() + fi->getIndentation(level) + "]";
 	}
 	void Writer::writeValue(const Value &node)
 	{
@@ -923,7 +923,7 @@ namespace Jzon
 		{
 			c = json.at(cursor);
 
-			if (IsWhitespace(c))
+			if (isWhitespace(c))
 				continue;
 
 			saveBuffer = true;
@@ -1287,7 +1287,7 @@ namespace Jzon
 			bool number = true;
 			for (std::string::const_iterator it = value.begin(); it != value.end(); ++it)
 			{
-				if (!IsNumber(*it))
+				if (!isNumber(*it))
 				{
 					number = false;
 					break;
