@@ -156,6 +156,7 @@ namespace Jzon
 
 		bool operator==(const Node &other) const;
 		bool operator!=(const Node &other) const;
+		inline operator bool() const { return isValid(); }
 
 	private:
 		typedef std::vector<NamedNode> NamedNodeList;
