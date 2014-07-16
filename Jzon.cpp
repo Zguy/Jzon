@@ -140,15 +140,40 @@ namespace Jzon
 		return (data == NULL ? T_INVALID : data->type);
 	}
 
-	std::string Node::toString(const std::string &default) const
+	std::string Node::toString() const
 	{
-		if (!isValue() || isNull())
+		if (isValue())
 		{
-			return default;
+			if (isNull())
+			{
+				return std::string("null");
+			}
+			else
+			{
+				return data->valueStr;
+			}
 		}
 		else
 		{
-			return data->valueStr;
+			return std::string();
+		}
+	}
+	std::string Node::toString(const std::string &default) const
+	{
+		if (isValue())
+		{
+			if (isNull())
+			{
+				return std::string("null");
+			}
+			else
+			{
+				return data->valueStr;
+			}
+		}
+		else
+		{
+			return default;
 		}
 	}
 	int Node::toInt(int default) const

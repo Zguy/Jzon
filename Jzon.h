@@ -112,6 +112,7 @@ namespace Jzon
 		inline bool isList()   const { return (isObject() || isArray()); }
 		inline bool isValue()  const { return (isNull() || isString() || isNumber() || isBool()); }
 
+		std::string toString() const;
 		std::string toString(const std::string &default) const;
 		int toInt(int default) const;
 		float toFloat(float default) const;
