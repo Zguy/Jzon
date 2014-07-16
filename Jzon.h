@@ -177,6 +177,7 @@ namespace Jzon
 	std::string escapeString(const std::string &value);
 	std::string unescapeString(const std::string &value);
 
+	Node invalid();
 	Node null();
 	Node object();
 	Node array();

@@ -560,6 +560,10 @@ namespace Jzon
 		return unescaped;
 	}
 
+	Node invalid()
+	{
+		return Node(Node::T_INVALID);
+	}
 	Node null()
 	{
 		return Node(Node::T_NULL);
