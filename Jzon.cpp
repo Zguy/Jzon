@@ -815,7 +815,7 @@ namespace Jzon
 	}
 	Node Parser::assemble()
 	{
-		std::stack<Node::NamedNode> nodeStack;
+		std::stack<NamedNode> nodeStack;
 		Node root(Node::T_INVALID);
 
 		std::string name = "";

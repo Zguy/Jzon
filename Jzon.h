@@ -37,11 +37,11 @@ namespace Jzon
 		const int MINOR = 1;
 	}
 
+	class Node;
+	typedef std::pair<std::string, Node> NamedNode;
+
 	class Node
 	{
-	public:
-		typedef std::pair<std::string, Node> NamedNode;
-
 	public:
 		class iterator : public std::iterator<std::input_iterator_tag, NamedNode>
 		{
