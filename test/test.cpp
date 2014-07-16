@@ -12,7 +12,7 @@ int main(int argc, char **argv)
 
 	std::string filename(argv[1]);
 	Jzon::FileReader reader(filename);
-	const std::string &error = reader.GetError();
+	const std::string &error = reader.getError();
 	if (!error.empty())
 	{
 		std::cerr << error << std::endl;
@@ -20,7 +20,7 @@ int main(int argc, char **argv)
 	}
 
 	Jzon::Node *node = NULL;
-	switch (reader.DetermineType())
+	switch (reader.determineType())
 	{
 	case Jzon::Node::T_ARRAY:
 		node = new Jzon::Array;
@@ -36,10 +36,10 @@ int main(int argc, char **argv)
 		return 1;
 	}
 
-	bool result = reader.Read(*node);
+	bool result = reader.read(*node);
 	if (!result)
 	{
-		std::cerr << reader.GetError() << std::endl;
+		std::cerr << reader.getError() << std::endl;
 		return 1;
 	}
 
