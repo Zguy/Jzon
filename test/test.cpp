@@ -11,35 +11,13 @@ int main(int argc, char **argv)
 	}
 
 	std::string filename(argv[1]);
-	Jzon::FileReader reader(filename);
-	const std::string &error = reader.getError();
-	if (!error.empty())
+	
+	Jzon::Parser parser;
+	
+	Jzon::Node node = parser.parseFile(filename);
+	if (!node.isValid())
 	{
-		std::cerr << error << std::endl;
-		return 1;
-	}
-
-	Jzon::Node *node = NULL;
-	switch (reader.determineType())
-	{
-	case Jzon::Node::T_ARRAY:
-		node = new Jzon::Array;
-		break;
-	case Jzon::Node::T_OBJECT:
-		node = new Jzon::Object;
-		break;
-	case Jzon::Node::T_VALUE:
-		node = new Jzon::Value;
-		break;
-	default:
-		std::cerr << "Sanity check fail" << std::endl;
-		return 1;
-	}
-
-	bool result = reader.read(*node);
-	if (!result)
-	{
-		std::cerr << reader.getError() << std::endl;
+		std::cerr << parser.getError() << std::endl;
 		return 1;
 	}
 
