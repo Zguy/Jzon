@@ -158,7 +158,7 @@ namespace Jzon
 			return std::string();
 		}
 	}
-	std::string Node::toString(const std::string &default) const
+	std::string Node::toString(const std::string &def) const
 	{
 		if (isValue())
 		{
@@ -173,10 +173,10 @@ namespace Jzon
 		}
 		else
 		{
-			return default;
+			return def;
 		}
 	}
-	int Node::toInt(int default) const
+	int Node::toInt(int def) const
 	{
 		if (isNumber())
 		{
@@ -187,10 +187,10 @@ namespace Jzon
 		}
 		else
 		{
-			return default;
+			return def;
 		}
 	}
-	float Node::toFloat(float default) const
+	float Node::toFloat(float def) const
 	{
 		if (isNumber())
 		{
@@ -201,10 +201,10 @@ namespace Jzon
 		}
 		else
 		{
-			return default;
+			return def;
 		}
 	}
-	double Node::toDouble(double default) const
+	double Node::toDouble(double def) const
 	{
 		if (isNumber())
 		{
@@ -215,10 +215,10 @@ namespace Jzon
 		}
 		else
 		{
-			return default;
+			return def;
 		}
 	}
-	bool Node::toBool(bool default) const
+	bool Node::toBool(bool def) const
 	{
 		if (isBool())
 		{
@@ -226,7 +226,7 @@ namespace Jzon
 		}
 		else
 		{
-			return default;
+			return def;
 		}
 	}
 
