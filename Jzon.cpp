@@ -602,7 +602,7 @@ namespace Jzon
 	}
 	void Writer::writeFile(const Node &node, const std::string &filename) const
 	{
-		std::ofstream stream(filename, std::ios::out | std::ios::trunc);
+		std::ofstream stream(filename.c_str(), std::ios::out | std::ios::trunc);
 		writeStream(node, stream);
 	}
 
@@ -697,7 +697,7 @@ namespace Jzon
 	}
 	Node Parser::parseFile(const std::string &filename)
 	{
-		std::ifstream stream(filename, std::ios::in);
+		std::ifstream stream(filename.c_str(), std::ios::in);
 		return parseStream(stream);
 	}
 
