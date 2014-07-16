@@ -589,31 +589,36 @@ namespace Jzon
 		spacing = (format.spacing ? " " : "");
 		newline = (format.newline ? "\n" : spacing);
 	}
-	const std::string &Writer::write(const Node &node)
+
+	void Writer::writeStream(const Node &node, std::ostream &stream) const
 	{
-		result.clear();
-		writeNode(node, 0);
-		return result;
+		writeNode(node, 0, stream);
+	}
+	void Writer::writeString(const Node &node, std::string &json) const
+	{
+		std::ostringstream stream(json);
+		writeStream(node, stream);
+		json = stream.str();
+	}
+	void Writer::writeFile(const Node &node, const std::string &filename) const
+	{
+		std::ofstream stream(filename, std::ios::out | std::ios::trunc);
+		writeStream(node, stream);
 	}
 
-	const std::string &Writer::getResult() const
-	{
-		return result;
-	}
-
-	void Writer::writeNode(const Node &node, unsigned int level)
+	void Writer::writeNode(const Node &node, unsigned int level, std::ostream &stream) const
 	{
 		switch (node.getType())
 		{
 		case Node::T_INVALID: break;
-		case Node::T_OBJECT : writeObject(node, level); break;
-		case Node::T_ARRAY  : writeArray(node, level);  break;
-		default             : writeValue(node);         break;
+		case Node::T_OBJECT : writeObject(node, level, stream); break;
+		case Node::T_ARRAY  : writeArray(node, level, stream);  break;
+		default             : writeValue(node, stream);         break;
 		}
 	}
-	void Writer::writeObject(const Node &node, unsigned int level)
+	void Writer::writeObject(const Node &node, unsigned int level, std::ostream &stream) const
 	{
-		result += "{" + newline;
+		stream << "{" << newline;
 
 		for (Node::const_iterator it = node.begin(); it != node.end(); ++it)
 		{
@@ -621,38 +626,38 @@ namespace Jzon
 			const Node &value = (*it).second;
 
 			if (it != node.begin())
-				result += "," + newline;
-			result += getIndentation(level+1) + "\""+name+"\"" + ":" + spacing;
-			writeNode(value, level+1);
+				stream << "," << newline;
+			stream << getIndentation(level+1) << "\""<<name<<"\"" << ":" << spacing;
+			writeNode(value, level+1, stream);
 		}
 
-		result += newline + getIndentation(level) + "}";
+		stream << newline << getIndentation(level) << "}";
 	}
-	void Writer::writeArray(const Node &node, unsigned int level)
+	void Writer::writeArray(const Node &node, unsigned int level, std::ostream &stream) const
 	{
-		result += "[" + newline;
+		stream << "[" << newline;
 
 		for (Node::const_iterator it = node.begin(); it != node.end(); ++it)
 		{
 			const Node &value = (*it).second;
 
 			if (it != node.begin())
-				result += "," + newline;
-			result += getIndentation(level+1);
-			writeNode(value, level+1);
+				stream << "," << newline;
+			stream << getIndentation(level+1);
+			writeNode(value, level+1, stream);
 		}
 
-		result += newline + getIndentation(level) + "]";
+		stream << newline << getIndentation(level) << "]";
 	}
-	void Writer::writeValue(const Node &node)
+	void Writer::writeValue(const Node &node, std::ostream &stream) const
 	{
 		if (node.isString())
 		{
-			result += "\""+escapeString(node.toString("null"))+"\"";
+			stream << "\""<<escapeString(node.toString())<<"\"";
 		}
 		else
 		{
-			result += node.toString("null");
+			stream << node.toString();
 		}
 	}
 
@@ -669,30 +674,31 @@ namespace Jzon
 	}
 
 
-	Parser::Parser() : jsonSize(0), cursor(0)
+	Parser::Parser() : stream(NULL)
 	{
-	}
-	Parser::Parser(const std::string &json) : cursor(0)
-	{
-		setJson(json);
 	}
 	Parser::~Parser()
 	{
 	}
 
-	void Parser::setJson(const std::string &json)
+	Node Parser::parseStream(std::istream &stream)
 	{
-		this->json = json;
-		jsonSize   = json.size();
-	}
-	Node Parser::parse()
-	{
-		cursor = 0;
+		this->stream = &stream;
 
 		tokenize();
 		Node node = assemble();
 
 		return node;
+	}
+	Node Parser::parseString(const std::string &json)
+	{
+		std::istringstream stream(json);
+		return parseStream(stream);
+	}
+	Node Parser::parseFile(const std::string &filename)
+	{
+		std::ifstream stream(filename, std::ios::in);
+		return parseStream(stream);
 	}
 
 	const std::string &Parser::getError() const
@@ -707,9 +713,9 @@ namespace Jzon
 		bool saveBuffer;
 
 		char c = '\0';
-		for (; cursor < jsonSize; ++cursor)
+		while (stream->peek() != std::char_traits<char>::eof())
 		{
-			c = json.at(cursor);
+			stream->get(c);
 
 			if (isWhitespace(c))
 				continue;
@@ -756,7 +762,7 @@ namespace Jzon
 				}
 			case '/':
 				{
-					char p = peek();
+					char p = static_cast<char>(stream->peek());
 					if (p == '*')
 					{
 						jumpToCommentEnd();
@@ -779,7 +785,7 @@ namespace Jzon
 				}
 			}
 
-			if ((saveBuffer || cursor == jsonSize-1) && (!valueBuffer.empty())) // Always save buffer on the last character
+			if ((saveBuffer || stream->peek() == std::char_traits<char>::eof()) && (!valueBuffer.empty())) // Always save buffer on the last character
 			{
 				if (interpretValue(valueBuffer))
 				{
@@ -950,30 +956,18 @@ namespace Jzon
 		return root;
 	}
 
-	char Parser::peek()
-	{
-		if (cursor < jsonSize-1)
-		{
-			return json.at(cursor+1);
-		}
-		else
-		{
-			return '\0';
-		}
-	}
 	void Parser::jumpToNext(char c)
 	{
-		++cursor;
-		while (cursor < jsonSize && json.at(cursor) != c)
-			++cursor;
+		while (!stream->eof() && static_cast<char>(stream->get()) != c);
+		stream->unget();
 	}
 	void Parser::jumpToCommentEnd()
 	{
-		cursor += 2;
+		stream->ignore(1);
 		char c1 = '\0', c2 = '\0';
-		for (; cursor < jsonSize; ++cursor)
+		while (stream->peek() != std::char_traits<char>::eof())
 		{
-			c2 = json.at(cursor);
+			stream->get(c2);
 
 			if (c1 == '*' && c2 == '/')
 				break;
@@ -984,17 +978,12 @@ namespace Jzon
 
 	void Parser::readString()
 	{
-		if (json.at(cursor) != '"')
-			return;
-
 		std::string str;
 
-		++cursor;
-
 		char c1 = '\0', c2 = '\0';
-		for (; cursor < jsonSize; ++cursor)
+		while (stream->peek() != std::char_traits<char>::eof())
 		{
-			c2 = json.at(cursor);
+			stream->get(c2);
 
 			if (c1 != '\\' && c2 == '"')
 			{
@@ -1047,72 +1036,6 @@ namespace Jzon
 				return false;
 			}
 		}
-
-		return true;
-	}
-
-
-	FileWriter::FileWriter(const Format &format) : writer(format)
-	{
-	}
-	FileWriter::~FileWriter()
-	{
-	}
-
-	void FileWriter::setFormat(const Format &format)
-	{
-		writer.setFormat(format);
-	}
-	void FileWriter::write(const std::string &filename, const Node &node)
-	{
-		writer.write(node);
-
-		std::fstream file(filename.c_str(), std::ios::out | std::ios::trunc);
-		file << writer.getResult();
-		file.close();
-	}
-
-
-	FileParser::FileParser()
-	{
-	}
-	FileParser::~FileParser()
-	{
-	}
-
-	Node FileParser::parse(const std::string &filename)
-	{
-		std::string json;
-		if (!loadFile(filename, json))
-		{
-			return Node(Node::T_INVALID);
-		}
-
-		parser.setJson(json);
-		Node node = parser.parse();
-		return node;
-	}
-
-	const std::string &FileParser::getError() const
-	{
-		return parser.getError();
-	}
-
-	bool FileParser::loadFile(const std::string &filename, std::string &json)
-	{
-		std::fstream file(filename.c_str(), std::ios::in | std::ios::binary);
-
-		if (!file.is_open())
-		{
-			return false;
-		}
-
-		file.seekg(0, std::ios::end);
-		std::ios::pos_type size = file.tellg();
-		file.seekg(0, std::ios::beg);
-
-		json.resize(static_cast<std::string::size_type>(size), '\0');
-		file.read(&json[0], size);
 
 		return true;
 	}

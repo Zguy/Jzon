@@ -26,6 +26,8 @@ THE SOFTWARE.
 #include <vector>
 #include <queue>
 #include <iterator>
+#include <istream>
+#include <ostream>
 
 namespace Jzon
 {
@@ -196,20 +198,18 @@ namespace Jzon
 		~Writer();
 
 		void setFormat(const Format &format);
-		const std::string &write(const Node &node);
 
-		/// Returns result from last call to write()
-		const std::string &getResult() const;
+		void writeStream(const Node &node, std::ostream &stream) const;
+		void writeString(const Node &node, std::string &json) const;
+		void writeFile(const Node &node, const std::string &filename) const;
 
 	private:
-		void writeNode(const Node &node, unsigned int level);
-		void writeObject(const Node &node, unsigned int level);
-		void writeArray(const Node &node, unsigned int level);
-		void writeValue(const Node &node);
+		void writeNode(const Node &node, unsigned int level, std::ostream &stream) const;
+		void writeObject(const Node &node, unsigned int level, std::ostream &stream) const;
+		void writeArray(const Node &node, unsigned int level, std::ostream &stream) const;
+		void writeValue(const Node &node, std::ostream &stream) const;
 
 		std::string getIndentation(unsigned int level) const;
-
-		std::string result;
 
 		Format format;
 		char indentationChar;
@@ -224,11 +224,11 @@ namespace Jzon
 	{
 	public:
 		Parser();
-		explicit Parser(const std::string &json);
 		~Parser();
 
-		void setJson(const std::string &json);
-		Node parse();
+		Node parseStream(std::istream &stream);
+		Node parseString(const std::string &json);
+		Node parseFile(const std::string &filename);
 
 		const std::string &getError() const;
 
@@ -248,53 +248,21 @@ namespace Jzon
 		void tokenize();
 		Node assemble();
 
-		char peek();
 		void jumpToNext(char c);
 		void jumpToCommentEnd();
 
 		void readString();
 		bool interpretValue(const std::string &value);
 
-		std::string json;
-		std::size_t jsonSize;
+		std::istream *stream;
 
 		std::queue<Token> tokens;
 		std::queue<std::pair<Node::Type, std::string> > data;
-
-		std::size_t cursor;
 
 		std::string error;
 
 		// Disable assignment operator
 		Parser &operator=(const Parser&);
-	};
-
-	class FileWriter
-	{
-	public:
-		explicit FileWriter(const Format &format = NoFormat);
-		~FileWriter();
-
-		void setFormat(const Format &format);
-		void write(const std::string &filename, const Node &node);
-
-	private:
-		Writer writer;
-	};
-
-	class FileParser
-	{
-	public:
-		FileParser();
-		~FileParser();
-
-		Node parse(const std::string &filename);
-
-		const std::string &getError() const;
-
-	private:
-		bool loadFile(const std::string &filename, std::string &json);
-		Parser parser;
 	};
 }
 
