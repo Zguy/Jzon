@@ -376,7 +376,7 @@ namespace Jzon
 	}
 	void Node::remove(size_t index)
 	{
-		if (isList() && index < data->children.size())
+		if (isContainer() && index < data->children.size())
 		{
 			detach();
 			NamedNodeList::iterator it = data->children.begin()+index;
@@ -444,7 +444,7 @@ namespace Jzon
 	}
 	Node Node::get(size_t index) const
 	{
-		if (isList() && index < data->children.size())
+		if (isContainer() && index < data->children.size())
 		{
 			return data->children.at(index).second;
 		}

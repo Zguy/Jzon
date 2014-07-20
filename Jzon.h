@@ -111,8 +111,8 @@ namespace Jzon
 		inline bool isNumber() const { return (getType() == T_NUMBER);  }
 		inline bool isBool()   const { return (getType() == T_BOOL);    }
 
-		inline bool isList()   const { return (isObject() || isArray()); }
-		inline bool isValue()  const { return (isNull() || isString() || isNumber() || isBool()); }
+		inline bool isContainer() const { return (isObject() || isArray()); }
+		inline bool isValue() const { return (isNull() || isString() || isNumber() || isBool()); }
 
 		std::string toString() const;
 		std::string toString(const std::string &def) const;
