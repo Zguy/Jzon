@@ -678,7 +678,7 @@ namespace Jzon
 	}
 
 
-	Parser::Parser() : stream(NULL)
+	Parser::Parser()
 	{
 	}
 	Parser::~Parser()
@@ -687,10 +687,11 @@ namespace Jzon
 
 	Node Parser::parseStream(std::istream &stream)
 	{
-		this->stream = &stream;
+		TokenQueue tokens;
+		DataQueue data;
 
-		tokenize();
-		Node node = assemble();
+		tokenize(stream, tokens, data);
+		Node node = assemble(tokens, data);
 
 		return node;
 	}
@@ -710,16 +711,16 @@ namespace Jzon
 		return error;
 	}
 
-	void Parser::tokenize()
+	void Parser::tokenize(std::istream &stream, TokenQueue &tokens, DataQueue &data)
 	{
 		Token token = T_UNKNOWN;
 		std::string valueBuffer;
 		bool saveBuffer;
 
 		char c = '\0';
-		while (stream->peek() != std::char_traits<char>::eof())
+		while (stream.peek() != std::char_traits<char>::eof())
 		{
-			stream->get(c);
+			stream.get(c);
 
 			if (isWhitespace(c))
 				continue;
@@ -761,21 +762,21 @@ namespace Jzon
 			case '"':
 				{
 					token = T_VALUE;
-					readString();
+					readString(stream, data);
 					break;
 				}
 			case '/':
 				{
-					char p = static_cast<char>(stream->peek());
+					char p = static_cast<char>(stream.peek());
 					if (p == '*')
 					{
-						jumpToCommentEnd();
+						jumpToCommentEnd(stream);
 						saveBuffer = false;
 						break;
 					}
 					else if (p == '/')
 					{
-						jumpToNext('\n');
+						jumpToNext('\n', stream);
 						saveBuffer = false;
 						break;
 					}
@@ -789,9 +790,9 @@ namespace Jzon
 				}
 			}
 
-			if ((saveBuffer || stream->peek() == std::char_traits<char>::eof()) && (!valueBuffer.empty())) // Always save buffer on the last character
+			if ((saveBuffer || stream.peek() == std::char_traits<char>::eof()) && (!valueBuffer.empty())) // Always save buffer on the last character
 			{
-				if (interpretValue(valueBuffer))
+				if (interpretValue(valueBuffer, data))
 				{
 					tokens.push(T_VALUE);
 				}
@@ -817,7 +818,7 @@ namespace Jzon
 			}
 		}
 	}
-	Node Parser::assemble()
+	Node Parser::assemble(TokenQueue &tokens, DataQueue &data)
 	{
 		std::stack<NamedNode> nodeStack;
 		Node root(Node::T_INVALID);
@@ -960,18 +961,18 @@ namespace Jzon
 		return root;
 	}
 
-	void Parser::jumpToNext(char c)
+	void Parser::jumpToNext(char c, std::istream &stream)
 	{
-		while (!stream->eof() && static_cast<char>(stream->get()) != c);
-		stream->unget();
+		while (!stream.eof() && static_cast<char>(stream.get()) != c);
+		stream.unget();
 	}
-	void Parser::jumpToCommentEnd()
+	void Parser::jumpToCommentEnd(std::istream &stream)
 	{
-		stream->ignore(1);
+		stream.ignore(1);
 		char c1 = '\0', c2 = '\0';
-		while (stream->peek() != std::char_traits<char>::eof())
+		while (stream.peek() != std::char_traits<char>::eof())
 		{
-			stream->get(c2);
+			stream.get(c2);
 
 			if (c1 == '*' && c2 == '/')
 				break;
@@ -980,14 +981,14 @@ namespace Jzon
 		}
 	}
 
-	void Parser::readString()
+	void Parser::readString(std::istream &stream, DataQueue &data)
 	{
 		std::string str;
 
 		char c1 = '\0', c2 = '\0';
-		while (stream->peek() != std::char_traits<char>::eof())
+		while (stream.peek() != std::char_traits<char>::eof())
 		{
-			stream->get(c2);
+			stream.get(c2);
 
 			if (c1 != '\\' && c2 == '"')
 			{
@@ -1001,7 +1002,7 @@ namespace Jzon
 
 		data.push(std::make_pair(Node::T_STRING, str));
 	}
-	bool Parser::interpretValue(const std::string &value)
+	bool Parser::interpretValue(const std::string &value, DataQueue &data)
 	{
 		std::string upperValue(value.size(), '\0');
 

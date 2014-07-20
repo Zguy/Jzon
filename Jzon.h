@@ -246,20 +246,17 @@ namespace Jzon
 			T_SEPARATOR_NAME,
 			T_VALUE
 		};
+		typedef std::queue<Token> TokenQueue;
+		typedef std::queue<std::pair<Node::Type, std::string> > DataQueue;
 
-		void tokenize();
-		Node assemble();
+		void tokenize(std::istream &stream, TokenQueue &tokens, DataQueue &data);
+		Node assemble(TokenQueue &tokens, DataQueue &data);
 
-		void jumpToNext(char c);
-		void jumpToCommentEnd();
+		void jumpToNext(char c, std::istream &stream);
+		void jumpToCommentEnd(std::istream &stream);
 
-		void readString();
-		bool interpretValue(const std::string &value);
-
-		std::istream *stream;
-
-		std::queue<Token> tokens;
-		std::queue<std::pair<Node::Type, std::string> > data;
+		void readString(std::istream &stream, DataQueue &data);
+		bool interpretValue(const std::string &value, DataQueue &data);
 
 		std::string error;
 
