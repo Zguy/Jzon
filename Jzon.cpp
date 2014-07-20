@@ -22,6 +22,7 @@ THE SOFTWARE.
 #ifdef JZON_DLL
 #	if defined _WIN32 || defined __CYGWIN__
 #		define JZON_API __declspec(dllexport)
+#		define JZON_STL_EXTERN
 #	endif
 #endif
 

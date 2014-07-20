@@ -33,6 +33,7 @@ THE SOFTWARE.
 #	ifdef JZON_DLL
 #		if defined _WIN32 || defined __CYGWIN__
 #			define JZON_API __declspec(dllimport)
+#			define JZON_STL_EXTERN extern
 #		elif __GNUC__ >= 4
 #			define JZON_API __attribute__ ((visibility ("default")))
 #		else
@@ -41,6 +42,11 @@ THE SOFTWARE.
 #	else
 #		define JZON_API
 #	endif
+#endif
+
+#ifdef JZON_STL_EXTERN
+JZON_STL_EXTERN template class JZON_API std::basic_string<char>;
+#undef JZON_STL_EXTERN
 #endif
 
 namespace Jzon
