@@ -217,9 +217,6 @@ namespace Jzon
 		char indentationChar;
 		std::string newline;
 		std::string spacing;
-
-		// Disable assignment operator
-		Writer &operator=(const Writer&);
 	};
 
 	class Parser
@@ -259,9 +256,6 @@ namespace Jzon
 		bool interpretValue(const std::string &value, DataQueue &data);
 
 		std::string error;
-
-		// Disable assignment operator
-		Parser &operator=(const Parser&);
 	};
 }
 
