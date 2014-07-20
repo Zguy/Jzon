@@ -189,13 +189,13 @@ namespace Jzon
 		} *data;
 	};
 
-	std::string escapeString(const std::string &value);
-	std::string unescapeString(const std::string &value);
+	JZON_API std::string escapeString(const std::string &value);
+	JZON_API std::string unescapeString(const std::string &value);
 
-	Node invalid();
-	Node null();
-	Node object();
-	Node array();
+	JZON_API Node invalid();
+	JZON_API Node null();
+	JZON_API Node object();
+	JZON_API Node array();
 
 	struct JZON_API Format
 	{
