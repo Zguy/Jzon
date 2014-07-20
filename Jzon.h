@@ -111,6 +111,7 @@ namespace Jzon
 
 		explicit Node(Type type);
 		Node(const Node &other);
+		Node(Type type, const std::string &value);
 		Node(const std::string &value);
 		Node(const char *value);
 		Node(int value);

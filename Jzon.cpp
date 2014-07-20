@@ -96,6 +96,10 @@ namespace Jzon
 			data->addRef();
 		}
 	}
+	Node::Node(Type type, const std::string &value) : data(new Data(T_NULL))
+	{
+		set(type, value);
+	}
 	Node::Node(const std::string &value) : data(new Data(T_STRING))
 	{
 		set(value);
@@ -252,7 +256,14 @@ namespace Jzon
 		{
 			detach();
 			data->type = type;
-			data->valueStr = value;
+			if (type == T_STRING)
+			{
+				data->valueStr = unescapeString(value);
+			}
+			else
+			{
+				data->valueStr = value;
+			}
 		}
 	}
 	void Node::set(const std::string &value)
@@ -813,9 +824,8 @@ namespace Jzon
 				valueBuffer.clear();
 			}
 
-			// Push the token last so that any
-			// value token will get pushed first
-			// from above.
+			// Push the token last so that any data
+			// will get pushed first from above.
 			// If saveBuffer is false, it means that
 			// we are in the middle of a value, so we
 			// don't want to push any tokens now.
@@ -930,16 +940,7 @@ namespace Jzon
 					}
 					else
 					{
-						Node node = null();
-
-						if (dataPair.first == Node::T_STRING)
-						{
-							node.set(dataPair.second); // This method calls unescapeString()
-						}
-						else
-						{
-							node.set(dataPair.first, dataPair.second);
-						}
+						Node node(dataPair.first, dataPair.second);
 						data.pop();
 
 						if (!nodeStack.empty())
