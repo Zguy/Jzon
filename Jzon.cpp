@@ -42,10 +42,6 @@ namespace Jzon
 		{
 			return (c == '\n' || c == ' ' || c == '\t' || c == '\r' || c == '\f');
 		}
-		inline bool isNumber(char c)
-		{
-			return ((c >= '0' && c <= '9') || c == '.' || c == '-');
-		}
 
 		const char charsUnescaped[] = { '\\'  , '/'  , '\"'  , '\n' , '\t' , '\b' , '\f' , '\r' };
 		const char *charsEscaped[]  = { "\\\\", "\\/", "\\\"", "\\n", "\\t", "\\b", "\\f", "\\r" };
@@ -1031,14 +1027,76 @@ namespace Jzon
 		else
 		{
 			bool number = true;
-			for (std::string::const_iterator it = value.begin(); it != value.end(); ++it)
+			bool negative = false;
+			bool fraction = false;
+			bool scientific = false;
+			bool scientificSign = false;
+			bool scientificNumber = false;
+			for (std::string::const_iterator it = upperValue.begin(); number && it != upperValue.end(); ++it)
 			{
-				if (!isNumber(*it))
+				char c = (*it);
+				switch (c)
 				{
-					number = false;
-					break;
+				case '-':
+					{
+						if (scientific)
+						{
+							if (scientificSign) // Only one - allowed after E
+								number = false;
+							else
+								scientificSign = true;
+						}
+						else
+						{
+							if (negative) // Only one - allowed before E
+								number = false;
+							else
+								negative = true;
+						}
+						break;
+					}
+				case '+':
+					{
+						if (!scientific || scientificSign)
+							number = false;
+						else
+							scientificSign = true;
+						break;
+					}
+				case '.':
+					{
+						if (fraction) // Only one . allowed
+							number = false;
+						else
+							fraction = true;
+						break;
+					}
+				case 'E':
+					{
+						if (scientific)
+							number = false;
+						else
+							scientific = true;
+						break;
+					}
+				default:
+					{
+						if (c >= '0' && c <= '9')
+						{
+							if (scientific)
+								scientificNumber = true;
+						}
+						else
+						{
+							number = false;
+						}
+						break;
+					}
 				}
 			}
+
+			if (scientific && !scientificNumber)
+				number = false;
 
 			if (number)
 			{
