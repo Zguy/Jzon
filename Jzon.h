@@ -236,8 +236,8 @@ namespace Jzon
 
 		Format format;
 		char indentationChar;
-		std::string newline;
-		std::string spacing;
+		const char *newline;
+		const char *spacing;
 	};
 
 	class JZON_API Parser
