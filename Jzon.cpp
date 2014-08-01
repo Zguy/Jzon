@@ -629,9 +629,12 @@ namespace Jzon
 		switch (node.getType())
 		{
 		case Node::T_INVALID: break;
-		case Node::T_OBJECT : writeObject(node, level, stream); break;
-		case Node::T_ARRAY  : writeArray(node, level, stream);  break;
-		default             : writeValue(node, stream);         break;
+		case Node::T_OBJECT: writeObject(node, level, stream); break;
+		case Node::T_ARRAY: writeArray(node, level, stream); break;
+		case Node::T_NULL: // Fallthrough
+		case Node::T_STRING: // Fallthrough
+		case Node::T_NUMBER: // Fallthrough
+		case Node::T_BOOL: writeValue(node, stream); break;
 		}
 	}
 	void Writer::writeObject(const Node &node, unsigned int level, std::ostream &stream) const
