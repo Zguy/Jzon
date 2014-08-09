@@ -821,7 +821,7 @@ namespace Jzon
 		std::stack<NamedNode> nodeStack;
 		Node root(Node::T_INVALID);
 
-		std::string name = "";
+		std::string nextName = "";
 
 		Token token;
 		while (!tokens.empty())
@@ -840,14 +840,14 @@ namespace Jzon
 				}
 			case T_OBJ_BEGIN:
 				{
-					nodeStack.push(std::make_pair(name, object()));
-					name.clear();
+					nodeStack.push(std::make_pair(nextName, object()));
+					nextName.clear();
 					break;
 				}
 			case T_ARRAY_BEGIN:
 				{
-					nodeStack.push(std::make_pair(name, array()));
-					name.clear();
+					nodeStack.push(std::make_pair(nextName, array()));
+					nextName.clear();
 					break;
 				}
 			case T_OBJ_END:
@@ -869,7 +869,7 @@ namespace Jzon
 						return Node(Node::T_INVALID);
 					}
 
-					std::string name = nodeStack.top().first;
+					std::string nodeName = nodeStack.top().first;
 					Node node = nodeStack.top().second;
 					nodeStack.pop();
 
@@ -878,7 +878,7 @@ namespace Jzon
 						Node &stackTop = nodeStack.top().second;
 						if (stackTop.isObject())
 						{
-							stackTop.add(name, node);
+							stackTop.add(nodeName, node);
 						}
 						else if (stackTop.isArray())
 						{
@@ -915,7 +915,7 @@ namespace Jzon
 						}
 						else
 						{
-							name = dataPair.second;
+							nextName = dataPair.second;
 							data.pop();
 						}
 					}
@@ -928,11 +928,11 @@ namespace Jzon
 						{
 							Node &stackTop = nodeStack.top().second;
 							if (stackTop.isObject())
-								stackTop.add(name, node);
+								stackTop.add(nextName, node);
 							else if (stackTop.isArray())
 								stackTop.add(node);
 
-							name.clear();
+							nextName.clear();
 						}
 						else
 						{
