@@ -135,12 +135,11 @@ namespace Jzon
 		inline bool isContainer() const { return (isObject() || isArray()); }
 		inline bool isValue() const { return (isNull() || isString() || isNumber() || isBool()); }
 
-		std::string toString() const;
-		std::string toString(const std::string &def) const;
-		int toInt(int def) const;
-		float toFloat(float def) const;
-		double toDouble(double def) const;
-		bool toBool(bool def) const;
+		std::string toString(const std::string &def = std::string()) const;
+		int toInt(int def = 0) const;
+		float toFloat(float def = 0.f) const;
+		double toDouble(double def = 0.0) const;
+		bool toBool(bool def = false) const;
 
 		void setNull();
 		void set(Type type, const std::string &value);
