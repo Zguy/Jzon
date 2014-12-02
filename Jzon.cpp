@@ -100,10 +100,6 @@ namespace Jzon
 	{
 		set(value);
 	}
-	Node::Node(const char *value) : data(new Data(T_STRING))
-	{
-		set(value);
-	}
 	Node::Node(int value) : data(new Data(T_NUMBER))
 	{
 		set(value);
@@ -160,7 +156,7 @@ namespace Jzon
 		{
 			if (isNull())
 			{
-				return std::string("null");
+				return "null";
 			}
 			else
 			{
@@ -266,9 +262,7 @@ namespace Jzon
 		{
 			detach();
 			data->type = T_NUMBER;
-			std::stringstream sstr;
-			sstr << value;
-			data->valueStr = sstr.str();
+			setValueStr(value);
 		}
 	}
 	void Node::set(unsigned int value)
@@ -277,9 +271,7 @@ namespace Jzon
 		{
 			detach();
 			data->type = T_NUMBER;
-			std::stringstream sstr;
-			sstr << value;
-			data->valueStr = sstr.str();
+			setValueStr(value);
 		}
 	}
 	void Node::set(int64_t value)
@@ -288,9 +280,7 @@ namespace Jzon
 		{
 			detach();
 			data->type = T_NUMBER;
-			std::stringstream sstr;
-			sstr << value;
-			data->valueStr = sstr.str();
+			setValueStr(value);
 		}
 	}
 	void Node::set(uint64_t value)
@@ -299,9 +289,7 @@ namespace Jzon
 		{
 			detach();
 			data->type = T_NUMBER;
-			std::stringstream sstr;
-			sstr << value;
-			data->valueStr = sstr.str();
+			setValueStr(value);
 		}
 	}
 	void Node::set(float value)
@@ -310,9 +298,7 @@ namespace Jzon
 		{
 			detach();
 			data->type = T_NUMBER;
-			std::stringstream sstr;
-			sstr << value;
-			data->valueStr = sstr.str();
+			setValueStr(value);
 		}
 	}
 	void Node::set(double value)
@@ -321,15 +307,14 @@ namespace Jzon
 		{
 			detach();
 			data->type = T_NUMBER;
-			std::stringstream sstr;
-			sstr << value;
-			data->valueStr = sstr.str();
+			setValueStr(value);
 		}
 	}
 	void Node::set(bool value)
 	{
 		if (isValue())
 		{
+			detach();
 			data->type = T_BOOL;
 			if (value)
 				data->valueStr = "true";
@@ -338,6 +323,7 @@ namespace Jzon
 		}
 	}
 
+	template <>
 	Node &Node::operator=(const Node &rhs)
 	{
 		if (this != &rhs)
@@ -352,36 +338,6 @@ namespace Jzon
 				data->addRef();
 			}
 		}
-		return *this;
-	}
-	Node &Node::operator=(const std::string &rhs)
-	{
-		set(rhs);
-		return *this;
-	}
-	Node &Node::operator=(const char *rhs)
-	{
-		set(rhs);
-		return *this;
-	}
-	Node &Node::operator=(int rhs)
-	{
-		set(rhs);
-		return *this;
-	}
-	Node &Node::operator=(float rhs)
-	{
-		set(rhs);
-		return *this;
-	}
-	Node &Node::operator=(double rhs)
-	{
-		set(rhs);
-		return *this;
-	}
-	Node &Node::operator=(bool rhs)
-	{
-		set(rhs);
 		return *this;
 	}
 

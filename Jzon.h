@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include <iterator>
 #include <istream>
 #include <ostream>
+#include <sstream>
 #include <stdint.h>
 
 #ifndef JZON_API
@@ -114,7 +115,6 @@ namespace Jzon
 		Node(const Node &other);
 		Node(Type type, const std::string &value);
 		Node(const std::string &value);
-		Node(const char *value);
 		Node(int value);
 		Node(unsigned int value);
 		Node(int64_t value);
@@ -156,13 +156,8 @@ namespace Jzon
 		void set(double value);
 		void set(bool value);
 
-		Node &operator=(const Node &rhs);
-		Node &operator=(const std::string &rhs);
-		Node &operator=(const char *rhs);
-		Node &operator=(int rhs);
-		Node &operator=(float rhs);
-		Node &operator=(double rhs);
-		Node &operator=(bool rhs);
+		template <typename T>
+		Node &operator=(const T &rhs);
 
 		void add(const Node &node);
 		void add(const std::string &name, const Node &node);
@@ -186,6 +181,9 @@ namespace Jzon
 		inline operator bool() const { return isValid(); }
 
 	private:
+		template <typename T>
+		void setValueStr(T value);
+
 		typedef std::vector<NamedNode> NamedNodeList;
 		struct Data
 		{
@@ -284,6 +282,25 @@ namespace Jzon
 
 		std::string error;
 	};
+
+	template <typename T>
+	void Node::setValueStr(T value)
+	{
+		std::stringstream sstr;
+		sstr << value;
+		data->valueStr = sstr.str();
+	}
+
+	// Explicit specialization for Node type
+	template <>
+	Node &Node::operator=(const Node &rhs);
+
+	template <typename T>
+	Node &Node::operator=(const T &rhs)
+	{
+		set(rhs);
+		return *this;
+	}
 }
 
 #endif // Jzon_h__
