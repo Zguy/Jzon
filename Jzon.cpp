@@ -154,11 +154,6 @@ namespace Jzon
 		}
 	}
 
-	Node::Type Node::getType() const
-	{
-		return (data == NULL ? T_INVALID : data->type);
-	}
-
 	std::string Node::toString(const std::string &def) const
 	{
 		if (isValue())
@@ -263,15 +258,6 @@ namespace Jzon
 			detach();
 			data->type = T_STRING;
 			data->valueStr = unescapeString(value);
-		}
-	}
-	void Node::set(const char *value)
-	{
-		if (isValue())
-		{
-			detach();
-			data->type = T_STRING;
-			data->valueStr = unescapeString(std::string(value));
 		}
 	}
 	void Node::set(int value)
