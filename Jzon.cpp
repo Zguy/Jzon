@@ -988,7 +988,15 @@ namespace Jzon
 					break;
 				}
 			case T_SEPARATOR_NAME:
-			case T_SEPARATOR_NODE: break;
+				break;
+			case T_SEPARATOR_NODE:
+				{
+					if (!tokens.empty() && tokens.front() == T_ARRAY_END) {
+						error = "Extra comma in array";
+						return Node(Node::T_INVALID);
+					}
+					break;
+				}
 			}
 		}
 
