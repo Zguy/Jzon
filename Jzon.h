@@ -167,6 +167,7 @@ namespace Jzon
 
 		void add(const Node &node);
 		void add(const std::string &name, const Node &node);
+		void append(const Node &node);
 		void remove(size_t index);
 		void remove(const std::string &name);
 		void clear();

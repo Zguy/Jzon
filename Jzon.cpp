@@ -415,6 +415,14 @@ namespace Jzon
 			data->children.push_back(std::make_pair(name, node));
 		}
 	}
+	void Node::append(const Node &node)
+	{
+		if (isObject())
+		{
+			detach();
+			data->children.insert(data->children.end(), node.data->children.begin(), node.data->children.end());
+		}
+	}
 	void Node::remove(size_t index)
 	{
 		if (isContainer() && index < data->children.size())
@@ -555,6 +563,7 @@ namespace Jzon
 	std::string escapeString(const std::string &value)
 	{
 		std::string escaped;
+		escaped.reserve(value.length());
 
 		for (std::string::const_iterator it = value.begin(); it != value.end(); ++it)
 		{
