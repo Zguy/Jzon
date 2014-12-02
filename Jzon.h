@@ -115,6 +115,7 @@ namespace Jzon
 		Node(const std::string &value);
 		Node(const char *value);
 		Node(int value);
+		Node(unsigned int value);
 		Node(float value);
 		Node(double value);
 		Node(bool value);
@@ -146,6 +147,7 @@ namespace Jzon
 		void set(const std::string &value);
 		void set(const char *value);
 		void set(int value);
+		void set(unsigned int value);
 		void set(float value);
 		void set(double value);
 		void set(bool value);

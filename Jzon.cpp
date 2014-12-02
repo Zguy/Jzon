@@ -108,6 +108,10 @@ namespace Jzon
 	{
 		set(value);
 	}
+	Node::Node(unsigned int value) : data(new Data(T_NUMBER))
+	{
+		set(value);
+	}
 	Node::Node(float value) : data(new Data(T_NUMBER))
 	{
 		set(value);
@@ -263,6 +267,17 @@ namespace Jzon
 		}
 	}
 	void Node::set(int value)
+	{
+		if (isValue())
+		{
+			detach();
+			data->type = T_NUMBER;
+			std::stringstream sstr;
+			sstr << value;
+			data->valueStr = sstr.str();
+		}
+	}
+	void Node::set(unsigned int value)
 	{
 		if (isValue())
 		{
