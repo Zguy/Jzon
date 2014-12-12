@@ -29,7 +29,7 @@ THE SOFTWARE.
 #include <istream>
 #include <ostream>
 #include <sstream>
-#include <stdint.h>
+#include <cstdint>
 
 #ifndef JZON_API
 #	ifdef JZON_DLL
@@ -117,8 +117,8 @@ namespace Jzon
 		Node(const std::string &value);
 		Node(int value);
 		Node(unsigned int value);
-		Node(int64_t value);
-		Node(uint64_t value);
+		Node(std::int64_t value);
+		Node(std::uint64_t value);
 		Node(float value);
 		Node(double value);
 		Node(bool value);
@@ -150,8 +150,8 @@ namespace Jzon
 		void set(const std::string &value);
 		void set(int value);
 		void set(unsigned int value);
-		void set(int64_t value);
-		void set(uint64_t value);
+		void set(std::int64_t value);
+		void set(std::uint64_t value);
 		void set(float value);
 		void set(double value);
 		void set(bool value);

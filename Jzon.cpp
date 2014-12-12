@@ -108,11 +108,11 @@ namespace Jzon
 	{
 		set(value);
 	}
-	Node::Node(int64_t value) : data(new Data(T_NUMBER))
+	Node::Node(std::int64_t value) : data(new Data(T_NUMBER))
 	{
 		set(value);
 	}
-	Node::Node(uint64_t value) : data(new Data(T_NUMBER))
+	Node::Node(std::uint64_t value) : data(new Data(T_NUMBER))
 	{
 		set(value);
 	}
@@ -274,7 +274,7 @@ namespace Jzon
 			setValueStr(value);
 		}
 	}
-	void Node::set(int64_t value)
+	void Node::set(std::int64_t value)
 	{
 		if (isValue())
 		{
@@ -283,7 +283,7 @@ namespace Jzon
 			setValueStr(value);
 		}
 	}
-	void Node::set(uint64_t value)
+	void Node::set(std::uint64_t value)
 	{
 		if (isValue())
 		{
