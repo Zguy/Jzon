@@ -108,6 +108,18 @@ namespace Jzon
 	{
 		set(value);
 	}
+	Node::Node(unsigned int value) : data(new Data(T_NUMBER))
+	{
+		set(value);
+	}
+	Node::Node(std::int64_t value) : data(new Data(T_NUMBER))
+	{
+		set(value);
+	}
+	Node::Node(std::uint64_t value) : data(new Data(T_NUMBER))
+	{
+		set(value);
+	}
 	Node::Node(float value) : data(new Data(T_NUMBER))
 	{
 		set(value);
@@ -140,11 +152,6 @@ namespace Jzon
 			}
 			data = newData;
 		}
-	}
-
-	Node::Type Node::getType() const
-	{
-		return (data == NULL ? T_INVALID : data->type);
 	}
 
 	std::string Node::toString(const std::string &def) const
@@ -273,6 +280,39 @@ namespace Jzon
 			data->valueStr = sstr.str();
 		}
 	}
+	void Node::set(unsigned int value)
+	{
+		if (isValue())
+		{
+			detach();
+			data->type = T_NUMBER;
+			std::stringstream sstr;
+			sstr << value;
+			data->valueStr = sstr.str();
+		}
+	}
+	void Node::set(std::int64_t value)
+	{
+		if (isValue())
+		{
+			detach();
+			data->type = T_NUMBER;
+			std::stringstream sstr;
+			sstr << value;
+			data->valueStr = sstr.str();
+		}
+	}
+	void Node::set(std::uint64_t value)
+	{
+		if (isValue())
+		{
+			detach();
+			data->type = T_NUMBER;
+			std::stringstream sstr;
+			sstr << value;
+			data->valueStr = sstr.str();
+		}
+	}
 	void Node::set(float value)
 	{
 		if (isValue())
@@ -299,6 +339,7 @@ namespace Jzon
 	{
 		if (isValue())
 		{
+			detach();
 			data->type = T_BOOL;
 			if (value)
 				data->valueStr = "true";
@@ -368,6 +409,14 @@ namespace Jzon
 		{
 			detach();
 			data->children.push_back(std::make_pair(name, node));
+		}
+	}
+	void Node::append(const Node &node)
+	{
+		if ((isObject() && node.isObject()) || (isArray() && node.isArray()))
+		{
+			detach();
+			data->children.insert(data->children.end(), node.data->children.begin(), node.data->children.end());
 		}
 	}
 	void Node::remove(size_t index)
@@ -510,6 +559,7 @@ namespace Jzon
 	std::string escapeString(const std::string &value)
 	{
 		std::string escaped;
+		escaped.reserve(value.length());
 
 		for (std::string::const_iterator it = value.begin(); it != value.end(); ++it)
 		{
@@ -943,7 +993,15 @@ namespace Jzon
 					break;
 				}
 			case T_SEPARATOR_NAME:
-			case T_SEPARATOR_NODE: break;
+				break;
+			case T_SEPARATOR_NODE:
+				{
+					if (!tokens.empty() && tokens.front() == T_ARRAY_END) {
+						error = "Extra comma in array";
+						return Node(Node::T_INVALID);
+					}
+					break;
+				}
 			}
 		}
 
