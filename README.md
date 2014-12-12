@@ -57,4 +57,3 @@ writer.writeStream(node, cout);
   }
 }
 ```
-
