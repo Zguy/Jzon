@@ -275,7 +275,9 @@ namespace Jzon
 		{
 			detach();
 			data->type = T_NUMBER;
-			setValueStr(value);
+			std::stringstream sstr;
+			sstr << value;
+			data->valueStr = sstr.str();
 		}
 	}
 	void Node::set(unsigned int value)
@@ -284,7 +286,9 @@ namespace Jzon
 		{
 			detach();
 			data->type = T_NUMBER;
-			setValueStr(value);
+			std::stringstream sstr;
+			sstr << value;
+			data->valueStr = sstr.str();
 		}
 	}
 	void Node::set(std::int64_t value)
@@ -293,7 +297,9 @@ namespace Jzon
 		{
 			detach();
 			data->type = T_NUMBER;
-			setValueStr(value);
+			std::stringstream sstr;
+			sstr << value;
+			data->valueStr = sstr.str();
 		}
 	}
 	void Node::set(std::uint64_t value)
@@ -302,7 +308,9 @@ namespace Jzon
 		{
 			detach();
 			data->type = T_NUMBER;
-			setValueStr(value);
+			std::stringstream sstr;
+			sstr << value;
+			data->valueStr = sstr.str();
 		}
 	}
 	void Node::set(float value)
@@ -311,7 +319,9 @@ namespace Jzon
 		{
 			detach();
 			data->type = T_NUMBER;
-			setValueStr(value);
+			std::stringstream sstr;
+			sstr << value;
+			data->valueStr = sstr.str();
 		}
 	}
 	void Node::set(double value)
@@ -320,7 +330,9 @@ namespace Jzon
 		{
 			detach();
 			data->type = T_NUMBER;
-			setValueStr(value);
+			std::stringstream sstr;
+			sstr << value;
+			data->valueStr = sstr.str();
 		}
 	}
 	void Node::set(bool value)
@@ -336,7 +348,6 @@ namespace Jzon
 		}
 	}
 
-	template <>
 	Node &Node::operator=(const Node &rhs)
 	{
 		if (this != &rhs)
@@ -351,6 +362,36 @@ namespace Jzon
 				data->addRef();
 			}
 		}
+		return *this;
+	}
+	Node &Node::operator=(const std::string &rhs)
+	{
+		set(rhs);
+		return *this;
+	}
+	Node &Node::operator=(const char *rhs)
+	{
+		set(rhs);
+		return *this;
+	}
+	Node &Node::operator=(int rhs)
+	{
+		set(rhs);
+		return *this;
+	}
+	Node &Node::operator=(float rhs)
+	{
+		set(rhs);
+		return *this;
+	}
+	Node &Node::operator=(double rhs)
+	{
+		set(rhs);
+		return *this;
+	}
+	Node &Node::operator=(bool rhs)
+	{
+		set(rhs);
 		return *this;
 	}
 
