@@ -413,7 +413,7 @@ namespace Jzon
 	}
 	void Node::append(const Node &node)
 	{
-		if (isObject())
+		if ((isObject() && node.isObject()) || (isArray() && node.isArray()))
 		{
 			detach();
 			data->children.insert(data->children.end(), node.data->children.begin(), node.data->children.end());
