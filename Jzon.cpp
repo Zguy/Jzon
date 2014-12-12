@@ -43,7 +43,7 @@ namespace Jzon
 			return (c == '\n' || c == ' ' || c == '\t' || c == '\r' || c == '\f');
 		}
 
-		const char charsUnescaped[] = { '\\'  , '\"'  , '\n' , '\t' , '\b' , '\f' , '\r' };
+		const char charsUnescaped[] = { '\\'  , '/'  , '\"'  , '\n' , '\t' , '\b' , '\f' , '\r' };
 		const char *charsEscaped[]  = { "\\\\", "\\/", "\\\"", "\\n", "\\t", "\\b", "\\f", "\\r" };
 		const unsigned int numEscapeChars = 8;
 		const char nullUnescaped = '\0';
