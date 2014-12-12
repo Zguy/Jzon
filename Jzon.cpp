@@ -256,6 +256,15 @@ namespace Jzon
 			data->valueStr = unescapeString(value);
 		}
 	}
+	void Node::set(const char *value)
+	{
+		if (isValue())
+		{
+			detach();
+			data->type = T_STRING;
+			data->valueStr = unescapeString(std::string(value));
+		}
+	}
 	void Node::set(int value)
 	{
 		if (isValue())

@@ -148,6 +148,7 @@ namespace Jzon
 		void setNull();
 		void set(Type type, const std::string &value);
 		void set(const std::string &value);
+		void set(const char *value);
 		void set(int value);
 		void set(unsigned int value);
 		void set(std::int64_t value);
