@@ -100,6 +100,10 @@ namespace Jzon
 	{
 		set(value);
 	}
+	Node::Node(const char *value) : data(new Data(T_STRING))
+	{
+		set(value);
+	}
 	Node::Node(int value) : data(new Data(T_NUMBER))
 	{
 		set(value);
@@ -156,7 +160,7 @@ namespace Jzon
 		{
 			if (isNull())
 			{
-				return "null";
+				return std::string("null");
 			}
 			else
 			{
