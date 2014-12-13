@@ -115,11 +115,11 @@ namespace Jzon
 	{
 		set(value);
 	}
-	Node::Node(std::int64_t value) : data(new Data(T_NUMBER))
+	Node::Node(long long value) : data(new Data(T_NUMBER))
 	{
 		set(value);
 	}
-	Node::Node(std::uint64_t value) : data(new Data(T_NUMBER))
+	Node::Node(unsigned long long value) : data(new Data(T_NUMBER))
 	{
 		set(value);
 	}
@@ -294,7 +294,7 @@ namespace Jzon
 			data->valueStr = sstr.str();
 		}
 	}
-	void Node::set(std::int64_t value)
+	void Node::set(long long value)
 	{
 		if (isValue())
 		{
@@ -305,7 +305,7 @@ namespace Jzon
 			data->valueStr = sstr.str();
 		}
 	}
-	void Node::set(std::uint64_t value)
+	void Node::set(unsigned long long value)
 	{
 		if (isValue())
 		{
