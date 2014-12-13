@@ -272,72 +272,22 @@ namespace Jzon
 			data->valueStr = unescapeString(std::string(value));
 		}
 	}
-	void Node::set(int value)
-	{
-		if (isValue())
-		{
-			detach();
-			data->type = T_NUMBER;
-			std::stringstream sstr;
-			sstr << value;
-			data->valueStr = sstr.str();
-		}
+#define SET_NUMBER \
+	if (isValue())\
+	{\
+		detach();\
+		data->type = T_NUMBER;\
+		std::stringstream sstr;\
+		sstr << value;\
+		data->valueStr = sstr.str();\
 	}
-	void Node::set(unsigned int value)
-	{
-		if (isValue())
-		{
-			detach();
-			data->type = T_NUMBER;
-			std::stringstream sstr;
-			sstr << value;
-			data->valueStr = sstr.str();
-		}
-	}
-	void Node::set(long long value)
-	{
-		if (isValue())
-		{
-			detach();
-			data->type = T_NUMBER;
-			std::stringstream sstr;
-			sstr << value;
-			data->valueStr = sstr.str();
-		}
-	}
-	void Node::set(unsigned long long value)
-	{
-		if (isValue())
-		{
-			detach();
-			data->type = T_NUMBER;
-			std::stringstream sstr;
-			sstr << value;
-			data->valueStr = sstr.str();
-		}
-	}
-	void Node::set(float value)
-	{
-		if (isValue())
-		{
-			detach();
-			data->type = T_NUMBER;
-			std::stringstream sstr;
-			sstr << value;
-			data->valueStr = sstr.str();
-		}
-	}
-	void Node::set(double value)
-	{
-		if (isValue())
-		{
-			detach();
-			data->type = T_NUMBER;
-			std::stringstream sstr;
-			sstr << value;
-			data->valueStr = sstr.str();
-		}
-	}
+	void Node::set(int value) { SET_NUMBER }
+	void Node::set(unsigned int value) { SET_NUMBER }
+	void Node::set(long long value) { SET_NUMBER }
+	void Node::set(unsigned long long value) { SET_NUMBER }
+	void Node::set(float value) { SET_NUMBER }
+	void Node::set(double value) { SET_NUMBER }
+#undef SET_NUMBER
 	void Node::set(bool value)
 	{
 		if (isValue())
