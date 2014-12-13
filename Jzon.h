@@ -110,6 +110,7 @@ namespace Jzon
 			T_BOOL
 		};
 
+		Node();
 		explicit Node(Type type);
 		Node(const Node &other);
 		Node(Type type, const std::string &value);

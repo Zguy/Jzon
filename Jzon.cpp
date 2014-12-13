@@ -78,6 +78,9 @@ namespace Jzon
 		}
 	}
 
+	Node::Node() : data(NULL)
+	{
+	}
 	Node::Node(Type type) : data(NULL)
 	{
 		if (type != T_INVALID)
