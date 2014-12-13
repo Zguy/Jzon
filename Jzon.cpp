@@ -367,36 +367,15 @@ namespace Jzon
 		}
 		return *this;
 	}
-	Node &Node::operator=(const std::string &rhs)
-	{
-		set(rhs);
-		return *this;
-	}
-	Node &Node::operator=(const char *rhs)
-	{
-		set(rhs);
-		return *this;
-	}
-	Node &Node::operator=(int rhs)
-	{
-		set(rhs);
-		return *this;
-	}
-	Node &Node::operator=(float rhs)
-	{
-		set(rhs);
-		return *this;
-	}
-	Node &Node::operator=(double rhs)
-	{
-		set(rhs);
-		return *this;
-	}
-	Node &Node::operator=(bool rhs)
-	{
-		set(rhs);
-		return *this;
-	}
+	Node &Node::operator=(const std::string &rhs) { set(rhs); return *this; }
+	Node &Node::operator=(const char *rhs) { set(rhs); return *this; }
+	Node &Node::operator=(int rhs) { set(rhs); return *this; }
+	Node &Node::operator=(unsigned int rhs) { set(rhs); return *this; }
+	Node &Node::operator=(long long rhs) { set(rhs); return *this; }
+	Node &Node::operator=(unsigned long long rhs) { set(rhs); return *this; }
+	Node &Node::operator=(float rhs) { set(rhs); return *this; }
+	Node &Node::operator=(double rhs) { set(rhs); return *this; }
+	Node &Node::operator=(bool rhs) { set(rhs); return *this; }
 
 	void Node::add(const Node &node)
 	{

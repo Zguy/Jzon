@@ -161,6 +161,9 @@ namespace Jzon
 		Node &operator=(const std::string &rhs);
 		Node &operator=(const char *rhs);
 		Node &operator=(int rhs);
+		Node &operator=(unsigned int rhs);
+		Node &operator=(long long rhs);
+		Node &operator=(unsigned long long rhs);
 		Node &operator=(float rhs);
 		Node &operator=(double rhs);
 		Node &operator=(bool rhs);
