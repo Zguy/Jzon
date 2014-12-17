@@ -93,46 +93,16 @@ namespace Jzon
 			data->addRef();
 		}
 	}
-	Node::Node(Type type, const std::string &value) : data(new Data(T_NULL))
-	{
-		set(type, value);
-	}
-	Node::Node(const std::string &value) : data(new Data(T_STRING))
-	{
-		set(value);
-	}
-	Node::Node(const char *value) : data(new Data(T_STRING))
-	{
-		set(value);
-	}
-	Node::Node(int value) : data(new Data(T_NUMBER))
-	{
-		set(value);
-	}
-	Node::Node(unsigned int value) : data(new Data(T_NUMBER))
-	{
-		set(value);
-	}
-	Node::Node(long long value) : data(new Data(T_NUMBER))
-	{
-		set(value);
-	}
-	Node::Node(unsigned long long value) : data(new Data(T_NUMBER))
-	{
-		set(value);
-	}
-	Node::Node(float value) : data(new Data(T_NUMBER))
-	{
-		set(value);
-	}
-	Node::Node(double value) : data(new Data(T_NUMBER))
-	{
-		set(value);
-	}
-	Node::Node(bool value) : data(new Data(T_BOOL))
-	{
-		set(value);
-	}
+	Node::Node(Type type, const std::string &value) : data(new Data(T_NULL)) { set(type, value); }
+	Node::Node(const std::string &value) : data(new Data(T_STRING)) { set(value); }
+	Node::Node(const char *value) : data(new Data(T_STRING)) { set(value); }
+	Node::Node(int value) : data(new Data(T_NUMBER)) { set(value); }
+	Node::Node(unsigned int value) : data(new Data(T_NUMBER)) { set(value); }
+	Node::Node(long long value) : data(new Data(T_NUMBER)) { set(value); }
+	Node::Node(unsigned long long value) : data(new Data(T_NUMBER)) { set(value); }
+	Node::Node(float value) : data(new Data(T_NUMBER)) { set(value); }
+	Node::Node(double value) : data(new Data(T_NUMBER)) { set(value); }
+	Node::Node(bool value) : data(new Data(T_BOOL)) { set(value); }
 	Node::~Node()
 	{
 		if (data != NULL && data->release())
