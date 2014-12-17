@@ -48,7 +48,7 @@ namespace Jzon
 		const unsigned int numEscapeChars = 8;
 		const char nullUnescaped = '\0';
 		const char *nullEscaped  = "\0\0";
-		const char *&getEscaped(const char &c)
+		const char *getEscaped(const char c)
 		{
 			for (unsigned int i = 0; i < numEscapeChars; ++i)
 			{
@@ -56,22 +56,20 @@ namespace Jzon
 
 				if (c == ue)
 				{
-					const char *&e = charsEscaped[i];
-					return e;
+					return charsEscaped[i];
 				}
 			}
 			return nullEscaped;
 		}
-		const char &getUnescaped(const char &c1, const char &c2)
+		char getUnescaped(const char c1, const char c2)
 		{
 			for (unsigned int i = 0; i < numEscapeChars; ++i)
 			{
-				const char *&e = charsEscaped[i];
+				const char *e = charsEscaped[i];
 
 				if (c1 == e[0] && c2 == e[1])
 				{
-					const char &ue = charsUnescaped[i];
-					return ue;
+					return charsUnescaped[i];
 				}
 			}
 			return nullUnescaped;
@@ -497,7 +495,7 @@ namespace Jzon
 		{
 			const char &c = (*it);
 
-			const char *&a = getEscaped(c);
+			const char *a = getEscaped(c);
 			if (a[0] != '\0')
 			{
 				escaped += a[0];
@@ -517,12 +515,12 @@ namespace Jzon
 
 		for (std::string::const_iterator it = value.begin(); it != value.end(); ++it)
 		{
-			const char &c = (*it);
+			const char c = (*it);
 			char c2 = '\0';
 			if (it+1 != value.end())
 				c2 = *(it+1);
 
-			const char &a = getUnescaped(c, c2);
+			const char a = getUnescaped(c, c2);
 			if (a != '\0')
 			{
 				unescaped += a;
