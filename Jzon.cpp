@@ -143,48 +143,22 @@ namespace Jzon
 			return def;
 		}
 	}
-	int Node::toInt(int def) const
-	{
-		if (isNumber())
-		{
-			std::stringstream sstr(data->valueStr);
-			int val;
-			sstr >> val;
-			return val;
-		}
-		else
-		{
-			return def;
-		}
+#define GET_NUMBER(T) \
+	if (isNumber())\
+	{\
+		std::stringstream sstr(data->valueStr);\
+		T val;\
+		sstr >> val;\
+		return val;\
+	}\
+	else\
+	{\
+		return def;\
 	}
-	float Node::toFloat(float def) const
-	{
-		if (isNumber())
-		{
-			std::stringstream sstr(data->valueStr);
-			float val;
-			sstr >> val;
-			return val;
-		}
-		else
-		{
-			return def;
-		}
-	}
-	double Node::toDouble(double def) const
-	{
-		if (isNumber())
-		{
-			std::stringstream sstr(data->valueStr);
-			double val;
-			sstr >> val;
-			return val;
-		}
-		else
-		{
-			return def;
-		}
-	}
+	int Node::toInt(int def) const { GET_NUMBER(int) }
+	float Node::toFloat(float def) const { GET_NUMBER(float) }
+	double Node::toDouble(double def) const { GET_NUMBER(double) }
+#undef GET_NUMBER
 	bool Node::toBool(bool def) const
 	{
 		if (isBool())
