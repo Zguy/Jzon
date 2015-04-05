@@ -262,10 +262,7 @@ namespace Jzon
 		{
 			detach();
 			data->type = T_BOOL;
-			if (value)
-				data->valueStr = "true";
-			else
-				data->valueStr = "false";
+			data->valueStr = (value ? "true" : "false");
 		}
 	}
 
