@@ -76,6 +76,7 @@ namespace Jzon
 			bool operator!=(const iterator &rhs) { return p != rhs.p; }
 
 			NamedNode &operator*() { return *p; }
+			NamedNode *operator->() { return p; }
 
 		private:
 			NamedNode *p;
