@@ -66,6 +66,7 @@ namespace Jzon
 		class iterator : public std::iterator<std::input_iterator_tag, NamedNode>
 		{
 		public:
+            iterator() : p(0) {}
 			iterator(NamedNode *o) : p(o) {}
 			iterator(const iterator &it) : p(it.p) {}
 
@@ -84,6 +85,7 @@ namespace Jzon
 		class const_iterator : public std::iterator<std::input_iterator_tag, const NamedNode>
 		{
 		public:
+			const_iterator() : p(0) {}
 			const_iterator(const NamedNode *o) : p(o) {}
 			const_iterator(const const_iterator &it) : p(it.p) {}
 
