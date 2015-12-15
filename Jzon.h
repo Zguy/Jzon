@@ -208,6 +208,7 @@ namespace Jzon
 			std::string valueStr;
 			NamedNodeList children;
 		} *data;
+
 	};
 
 	JZON_API std::string escapeString(const std::string &value);
@@ -217,6 +218,16 @@ namespace Jzon
 	JZON_API Node null();
 	JZON_API Node object();
 	JZON_API Node array();
+
+    class JZON_API NamedNodeComparator
+    {
+        private:
+            const std::string& name;
+        public:
+            NamedNodeComparator(const std::string& name_) : name(name_) {}
+            bool operator()(const NamedNode& n) { return n.first == name;}
+    };
+
 
 	struct JZON_API Format
 	{

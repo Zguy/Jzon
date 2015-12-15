@@ -33,6 +33,7 @@ THE SOFTWARE.
 #include <stack>
 #include <algorithm>
 #include <cassert>
+#include <iostream>
 
 namespace Jzon
 {
@@ -305,14 +306,7 @@ namespace Jzon
 		{
 			detach();
 			NamedNodeList &children = data->children;
-			for (NamedNodeList::iterator it = children.begin(); it != children.end(); ++it)
-			{
-				if ((*it).first == name)
-				{
-					children.erase(it);
-					break;
-				}
-			}
+            children.erase(std::remove_if(children.begin(), children.end(), NamedNodeComparator(name)), children.end());
 		}
 	}
 	void Node::clear()
