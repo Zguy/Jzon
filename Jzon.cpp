@@ -144,12 +144,15 @@ namespace Jzon
 		}
 	}
 #define GET_NUMBER(T) \
-	if (isNumber())\
+	if (isValue())\
 	{\
 		std::stringstream sstr(data->valueStr);\
-		T val;\
+		double val;\
+        std::string remain;\
 		sstr >> val;\
-		return val;\
+        if(sstr.fail()) return def;\
+        sstr >> remain;\
+        return remain.empty() ? val : def;\
 	}\
 	else\
 	{\

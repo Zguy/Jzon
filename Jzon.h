@@ -29,6 +29,7 @@ THE SOFTWARE.
 #include <istream>
 #include <ostream>
 
+
 #ifndef JZON_API
 #	ifdef JZON_DLL
 #		if defined _WIN32 || defined __CYGWIN__
