@@ -348,7 +348,7 @@ namespace Jzon
 		if (isObject())
 		{
 			NamedNodeList &children = data->children;
-			for (NamedNodeList::const_iterator it = children.begin(); it != children.end(); ++it)
+			for (NamedNodeList::const_reverse_iterator it = children.rbegin(); it != children.rend(); ++it)
 			{
 				if ((*it).first == name)
 				{
