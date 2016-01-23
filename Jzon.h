@@ -73,6 +73,11 @@ namespace Jzon
 			iterator &operator++() { ++p; return *this; }
 			iterator operator++(int) { iterator tmp(*this); operator++(); return tmp; }
 
+            friend iterator operator+(const iterator& it, int n) { return iterator(it.p + n); }
+            friend iterator operator+(int n, const iterator& it) { return iterator(it.p + n); }
+
+            friend iterator operator-(const iterator& it, int n) { return iterator(it.p - n); }
+
 			bool operator==(const iterator &rhs) { return p == rhs.p; }
 			bool operator!=(const iterator &rhs) { return p != rhs.p; }
 
