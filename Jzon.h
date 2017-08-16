@@ -66,7 +66,7 @@ namespace Jzon
 		class iterator : public std::iterator<std::input_iterator_tag, NamedNode>
 		{
 		public:
-            iterator() : p(0) {}
+			iterator() : p(0) {}
 			iterator(NamedNode *o) : p(o) {}
 			iterator(const iterator &it) : p(it.p) {}
 
@@ -252,6 +252,45 @@ namespace Jzon
 		char indentationChar;
 		const char *newline;
 		const char *spacing;
+	};
+
+	class JZON_API StreamWriter
+	{
+	public:
+		explicit StreamWriter(std::ostream& stream, const Format& format = NoFormat);
+		~StreamWriter();
+
+		void startObject();
+		void startObject(const std::string& name);
+		void endObject();
+		void startArray();
+		void startArray(const std::string& name);
+		void endArray();
+		void addNode(const Node& node);
+		void addNode(const std::string& name, const Node& node);
+
+		bool isComplete();
+
+	private:
+		enum StreamState
+		{
+			SS_OBJECT,
+			SS_ARRAY,
+		};
+		std::string getIndentation(unsigned int level) const;
+		void writeNode(const Node& node, unsigned int level) const;
+		void writeObject(const Node& node, unsigned int level) const;
+		void writeArray(const Node& node, unsigned int level) const;
+		void writeValue(const Node& node) const;
+
+		Format format;
+		char indentationChar;
+		const char* newline;
+		const char* spacing;
+
+		std::ostream& stream;
+		bool first;
+		std::vector<StreamState> streamStack;
 	};
 
 	class JZON_API Parser

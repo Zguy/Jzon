@@ -598,6 +598,168 @@ namespace Jzon
 	}
 
 
+	StreamWriter::StreamWriter(std::ostream & stream, const Format & format)
+		: stream(stream), first(true)
+	{
+		this->format = format;
+		indentationChar = (format.useTabs ? '\t' : ' ');
+		spacing = (format.spacing ? " " : "");
+		newline = (format.newline ? "\n" : spacing);
+	}
+	StreamWriter::~StreamWriter()
+	{
+	}
+	void StreamWriter::startObject()
+	{
+		if (!isComplete() && streamStack.back() == StreamState::SS_OBJECT)
+			throw "Object members must be properties";
+		if (isComplete() && !first)
+			throw "Root JSON is complete";
+		if (!first) stream << "," << newline;
+		stream << getIndentation(streamStack.size()) << "{" << newline;
+		streamStack.push_back(StreamState::SS_OBJECT);
+		first = true;
+	}
+	void StreamWriter::startObject(const std::string & name)
+	{
+		if (!isComplete() && streamStack.back() != StreamState::SS_OBJECT)
+			throw "Cannot create property outside of an object";
+		if (isComplete() && !first)
+			throw "Root JSON is complete";
+		if (!first) stream << "," << newline;
+		stream << getIndentation(streamStack.size()) << "\"" << name << "\": {" << newline;
+		streamStack.push_back(StreamState::SS_OBJECT);
+		first = true;
+	}
+	void StreamWriter::endObject()
+	{
+		if (streamStack.back() != StreamState::SS_OBJECT)
+			throw "Cannot end object while not in object";
+		streamStack.pop_back();
+		stream << newline << getIndentation(streamStack.size()) << "}";
+		first = false;
+	}
+	void StreamWriter::startArray()
+	{
+		if (!isComplete() && streamStack.back() == StreamState::SS_OBJECT)
+			throw "Object members must be properties";
+		if (isComplete() && !first)
+			throw "Root JSON is complete";
+		if (!first) stream << "," << newline;
+		stream << getIndentation(streamStack.size()) << "[" << newline;
+		streamStack.push_back(StreamState::SS_ARRAY);
+		first = true;
+	}
+	void StreamWriter::startArray(const std::string & name)
+	{
+		if (!isComplete() && streamStack.back() != StreamState::SS_OBJECT)
+			throw "Cannot create property outside of an object";
+		if (isComplete() && !first)
+			throw "Root JSON is complete";
+		if (!first) stream << "," << newline;
+		stream << getIndentation(streamStack.size()) << "\"" << name << "\": [" << newline;
+		streamStack.push_back(StreamState::SS_ARRAY);
+		first = true;
+	}
+	void StreamWriter::endArray()
+	{
+		if (streamStack.back() != StreamState::SS_ARRAY)
+			throw "Cannot end array while not in array";
+		streamStack.pop_back();
+		stream << newline << getIndentation(streamStack.size()) << "]";
+		first = false;
+	}
+	void StreamWriter::addNode(const Node & node)
+	{
+		if (!isComplete() && streamStack.back() == StreamState::SS_OBJECT)
+			throw "Object members must be properties";
+		if (isComplete() && !first)
+			throw "Root JSON is complete";
+		if (!first) stream << "," << newline;
+		stream << getIndentation(streamStack.size());
+		writeNode(node, streamStack.size());
+		first = false;
+	}
+	void StreamWriter::addNode(const std::string & name, const Node & node)
+	{
+		if (!isComplete() && streamStack.back() != StreamState::SS_OBJECT)
+			throw "Cannot create property outside of an object";
+		if (isComplete() && !first)
+			throw "Root JSON is complete";
+		if (!first) stream << "," << newline;
+		stream << getIndentation(streamStack.size()) << "\"" << name << "\": ";
+		writeNode(node, streamStack.size());
+		first = false;
+	}
+	bool StreamWriter::isComplete()
+	{
+		return streamStack.size() == 0;
+	}
+	std::string StreamWriter::getIndentation(unsigned int level) const
+	{
+		if (!format.newline) return "";
+		else return std::string(format.indentSize * level, indentationChar);
+	}
+	void StreamWriter::writeNode(const Node& node, unsigned int level) const
+	{
+		switch (node.getType())
+		{
+			case Node::T_INVALID: break;
+			case Node::T_OBJECT: writeObject(node, level); break;
+			case Node::T_ARRAY: writeArray(node, level); break;
+			case Node::T_NULL: // Fallthrough
+			case Node::T_STRING: // Fallthrough
+			case Node::T_NUMBER: // Fallthrough
+			case Node::T_BOOL: writeValue(node); break;
+		}
+	}
+	void StreamWriter::writeObject(const Node& node, unsigned int level) const
+	{
+		stream << "{" << newline;
+
+		for (Node::const_iterator it = node.begin(); it != node.end(); ++it)
+		{
+			const std::string& name = (*it).first;
+			const Node& value = (*it).second;
+
+			if (it != node.begin())
+				stream << "," << newline;
+			stream << getIndentation(level + 1) << "\"" << name << "\"" << ":" << spacing;
+			writeNode(value, level + 1);
+		}
+
+		stream << newline << getIndentation(level) << "}";
+	}
+	void StreamWriter::writeArray(const Node& node, unsigned int level) const
+	{
+		stream << "[" << newline;
+
+		for (Node::const_iterator it = node.begin(); it != node.end(); ++it)
+		{
+			const Node& value = (*it).second;
+
+			if (it != node.begin())
+				stream << "," << newline;
+			stream << getIndentation(level + 1);
+			writeNode(value, level + 1);
+		}
+
+		stream << newline << getIndentation(level) << "]";
+	}
+	void StreamWriter::writeValue(const Node& node) const
+	{
+		if (node.isString())
+		{
+			stream << "\"" << escapeString(node.toString()) << "\"";
+		}
+		else
+		{
+			stream << node.toString();
+		}
+	}
+
+
+
 	Parser::Parser()
 	{
 	}
