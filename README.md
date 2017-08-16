@@ -33,7 +33,38 @@ node.add("bool", true);
 }
 
 Jzon::Writer writer;
+writer.setFormat(Jzon::StandardFormat);
 writer.writeStream(node, cout);
+```
+
+```c
+Jzon::StreamWriter writer = Jzon::StreamWriter(std::cout, Jzon::StandardFormat);
+writer.startObject();
+{
+    writer.addNode("name", "value");
+    writer.addNode("number", 20);
+    writer.addNode("anothernumber", 15.3);
+    writer.addNode("bool", true);
+    writer.startArray("array");
+    {
+        writer.addNode(1);
+        writer.addNode("asdf");
+        writer.startObject();
+        {
+            writer.addNode("key1", "val1");
+            writer.addNode("key2", "val2");
+        }
+        writer.endObject();
+    }
+    writer.endArray();
+    writer.startObject("subnode");
+    {
+        writer.addNode("key1", "val1");
+        writer.addNode("key2", "val2");
+    }
+    writer.endObject();
+}
+writer.endObject();
 ```
 
 #### Result
