@@ -627,7 +627,7 @@ namespace Jzon
 		if (isComplete() && !first)
 			throw "Root JSON is complete";
 		if (!first) stream << "," << newline;
-		stream << getIndentation(streamStack.size()) << "\"" << name << "\": {" << newline;
+		stream << getIndentation(streamStack.size()) << "\"" << name << "\":" << spacing << "{" << newline;
 		streamStack.push_back(StreamState::SS_OBJECT);
 		first = true;
 	}
@@ -657,7 +657,7 @@ namespace Jzon
 		if (isComplete() && !first)
 			throw "Root JSON is complete";
 		if (!first) stream << "," << newline;
-		stream << getIndentation(streamStack.size()) << "\"" << name << "\": [" << newline;
+		stream << getIndentation(streamStack.size()) << "\"" << name << "\":" << spacing << "[" << newline;
 		streamStack.push_back(StreamState::SS_ARRAY);
 		first = true;
 	}
@@ -687,7 +687,7 @@ namespace Jzon
 		if (isComplete() && !first)
 			throw "Root JSON is complete";
 		if (!first) stream << "," << newline;
-		stream << getIndentation(streamStack.size()) << "\"" << name << "\": ";
+		stream << getIndentation(streamStack.size()) << "\"" << name << "\":" << spacing;
 		writeNode(node, streamStack.size());
 		first = false;
 	}
