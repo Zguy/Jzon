@@ -66,6 +66,7 @@ namespace Jzon
 		class iterator : public std::iterator<std::input_iterator_tag, NamedNode>
 		{
 		public:
+            iterator() : p(0) {}
 			iterator(NamedNode *o) : p(o) {}
 			iterator(const iterator &it) : p(it.p) {}
 
@@ -76,6 +77,7 @@ namespace Jzon
 			bool operator!=(const iterator &rhs) { return p != rhs.p; }
 
 			NamedNode &operator*() { return *p; }
+			NamedNode *operator->() { return p; }
 
 		private:
 			NamedNode *p;
@@ -83,6 +85,7 @@ namespace Jzon
 		class const_iterator : public std::iterator<std::input_iterator_tag, const NamedNode>
 		{
 		public:
+			const_iterator() : p(0) {}
 			const_iterator(const NamedNode *o) : p(o) {}
 			const_iterator(const const_iterator &it) : p(it.p) {}
 
@@ -93,6 +96,7 @@ namespace Jzon
 			bool operator!=(const const_iterator &rhs) { return p != rhs.p; }
 
 			const NamedNode &operator*() { return *p; }
+			const NamedNode *operator->() { return p; }
 
 		private:
 			const NamedNode *p;

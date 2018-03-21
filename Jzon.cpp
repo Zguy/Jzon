@@ -334,7 +334,7 @@ namespace Jzon
 	}
 	size_t Node::getCount() const
 	{
-		return data->children.size();
+		return data != NULL ? data->children.size() : 0;
 	}
 	Node Node::get(const std::string &name) const
 	{
