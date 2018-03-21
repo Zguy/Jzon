@@ -186,14 +186,7 @@ namespace Jzon
 		{
 			detach();
 			data->type = type;
-			if (type == T_STRING)
-			{
-				data->valueStr = unescapeString(value);
-			}
-			else
-			{
-				data->valueStr = value;
-			}
+			data->valueStr = value;
 		}
 	}
 	void Node::set(const std::string &value)
@@ -202,7 +195,7 @@ namespace Jzon
 		{
 			detach();
 			data->type = T_STRING;
-			data->valueStr = unescapeString(value);
+			data->valueStr = value;
 		}
 	}
 	void Node::set(const char *value)
@@ -211,7 +204,7 @@ namespace Jzon
 		{
 			detach();
 			data->type = T_STRING;
-			data->valueStr = unescapeString(std::string(value));
+			data->valueStr = std::string(value);
 		}
 	}
 #define SET_NUMBER \
@@ -514,6 +507,7 @@ namespace Jzon
 	void Writer::writeStream(const Node &node, std::ostream &stream) const
 	{
 		writeNode(node, 0, stream);
+        stream << newline;
 	}
 	void Writer::writeString(const Node &node, std::string &json) const
 	{
@@ -918,7 +912,7 @@ namespace Jzon
 			c1 = c2;
 		}
 
-		data.push(std::make_pair(Node::T_STRING, str));
+		data.push(std::make_pair(Node::T_STRING, unescapeString(str)));
 	}
 	bool Parser::interpretValue(const std::string &value, DataQueue &data)
 	{
