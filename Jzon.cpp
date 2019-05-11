@@ -93,10 +93,12 @@ namespace Jzon
 	}
 	Node::Node(Type type, const std::string &value) : data(std::make_shared<Data>(T_NULL)) { set(type, value); }
 	Node::Node(const std::string &value) : data(std::make_shared<Data>(T_STRING)) { set(value); }
-	Node::Node(std::string value) : data(std::make_shared<Data>(T_STRING)) { set(std::move(value)); }
+	Node::Node(std::string&& value) : data(std::make_shared<Data>(T_STRING)) { set(std::move(value)); }
 	Node::Node(const char *value) : data(std::make_shared<Data>(T_STRING)) { set(value); }
 	Node::Node(int value) : data(std::make_shared<Data>(T_NUMBER)) { set(value); }
 	Node::Node(unsigned int value) : data(std::make_shared<Data>(T_NUMBER)) { set(value); }
+	Node::Node(long value) : data(std::make_shared<Data>(T_NUMBER)) { set(value); }
+	Node::Node(unsigned long value) : data(std::make_shared<Data>(T_NUMBER)) { set(value); }
 	Node::Node(long long value) : data(std::make_shared<Data>(T_NUMBER)) { set(value); }
 	Node::Node(unsigned long long value) : data(std::make_shared<Data>(T_NUMBER)) { set(value); }
 	Node::Node(float value) : data(std::make_shared<Data>(T_NUMBER)) { set(value); }

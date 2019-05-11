@@ -121,10 +121,12 @@ namespace Jzon
 		Node(Node &&other);
 		Node(Type type, const std::string &value);
 		Node(const std::string &value);
-		Node(std::string value);
+		Node(std::string&& value);
 		Node(const char *value);
 		Node(int value);
 		Node(unsigned int value);
+		Node(long value);
+		Node(unsigned long value);
 		Node(long long value);
 		Node(unsigned long long value);
 		Node(float value);
