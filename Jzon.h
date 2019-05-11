@@ -28,6 +28,7 @@ THE SOFTWARE.
 #include <iterator>
 #include <istream>
 #include <ostream>
+#include <sstream>
 
 #ifndef JZON_API
 #	ifdef JZON_DLL
@@ -151,10 +152,13 @@ namespace Jzon
 
 		void setNull();
 		void set(Type type, const std::string &value);
+		void set(Type type, const char *value);
 		void set(const std::string &value);
 		void set(const char *value);
 		void set(int value);
 		void set(unsigned int value);
+		void set(long value);
+		void set(unsigned long value);
 		void set(long long value);
 		void set(unsigned long long value);
 		void set(float value);
@@ -166,6 +170,8 @@ namespace Jzon
 		Node &operator=(const char *rhs);
 		Node &operator=(int rhs);
 		Node &operator=(unsigned int rhs);
+		Node &operator=(long rhs);
+		Node &operator=(unsigned long rhs);
 		Node &operator=(long long rhs);
 		Node &operator=(unsigned long long rhs);
 		Node &operator=(float rhs);
@@ -174,6 +180,7 @@ namespace Jzon
 
 		void add(const Node &node);
 		void add(const std::string &name, const Node &node);
+		void add(std::string &&name, const Node &node);
 		void append(const Node &node);
 		void remove(size_t index);
 		void remove(const std::string &name);
@@ -181,6 +188,7 @@ namespace Jzon
 
 		bool has(const std::string &name) const;
 		size_t getCount() const;
+		Node get(const char *name) const;
 		Node get(const std::string &name) const;
 		Node get(size_t index) const;
 
@@ -194,11 +202,25 @@ namespace Jzon
 		inline operator bool() const { return isValid(); }
 
 	private:
+		template <typename T>
+		inline void set_number(T value)
+		{
+			if (isValue())
+			{
+				detach();
+				data->type = T_NUMBER;
+				std::ostringstream sstr;
+				sstr << value;
+				data->valueStr = sstr.str();
+			}
+		}
+
 		typedef std::vector<NamedNode> NamedNodeList;
 		struct Data
 		{
 			explicit Data(Type type);
 			Data(const Data &other);
+			Data(Data &&other);
 			~Data();
 			void addRef();
 			bool release();
@@ -212,6 +234,7 @@ namespace Jzon
 
 	JZON_API std::string escapeString(const std::string &value);
 	JZON_API std::string unescapeString(const std::string &value);
+	JZON_API std::string unescapeString(const char *value);
 
 	JZON_API Node invalid();
 	JZON_API Node null();
