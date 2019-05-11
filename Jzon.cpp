@@ -82,45 +82,35 @@ namespace Jzon
 	{
 		if (type != T_INVALID)
 		{
-			data = new Data(type);
+			data = std::make_shared<Data>(type);
 		}
 	}
 	Node::Node(const Node &other) : data(other.data)
 	{
-		if (data != NULL)
-		{
-			data->addRef();
-		}
 	}
-	Node::Node(Type type, const std::string &value) : data(new Data(T_NULL)) { set(type, value); }
-	Node::Node(const std::string &value) : data(new Data(T_STRING)) { set(value); }
-	Node::Node(const char *value) : data(new Data(T_STRING)) { set(value); }
-	Node::Node(int value) : data(new Data(T_NUMBER)) { set(value); }
-	Node::Node(unsigned int value) : data(new Data(T_NUMBER)) { set(value); }
-	Node::Node(long long value) : data(new Data(T_NUMBER)) { set(value); }
-	Node::Node(unsigned long long value) : data(new Data(T_NUMBER)) { set(value); }
-	Node::Node(float value) : data(new Data(T_NUMBER)) { set(value); }
-	Node::Node(double value) : data(new Data(T_NUMBER)) { set(value); }
-	Node::Node(bool value) : data(new Data(T_BOOL)) { set(value); }
+	Node::Node(Node &&other) : data(std::move(other.data))
+	{
+	}
+	Node::Node(Type type, const std::string &value) : data(std::make_shared<Data>(T_NULL)) { set(type, value); }
+	Node::Node(const std::string &value) : data(std::make_shared<Data>(T_STRING)) { set(value); }
+	Node::Node(std::string value) : data(std::make_shared<Data>(T_STRING)) { set(std::move(value)); }
+	Node::Node(const char *value) : data(std::make_shared<Data>(T_STRING)) { set(value); }
+	Node::Node(int value) : data(std::make_shared<Data>(T_NUMBER)) { set(value); }
+	Node::Node(unsigned int value) : data(std::make_shared<Data>(T_NUMBER)) { set(value); }
+	Node::Node(long long value) : data(std::make_shared<Data>(T_NUMBER)) { set(value); }
+	Node::Node(unsigned long long value) : data(std::make_shared<Data>(T_NUMBER)) { set(value); }
+	Node::Node(float value) : data(std::make_shared<Data>(T_NUMBER)) { set(value); }
+	Node::Node(double value) : data(std::make_shared<Data>(T_NUMBER)) { set(value); }
+	Node::Node(bool value) : data(std::make_shared<Data>(T_BOOL)) { set(value); }
 	Node::~Node()
 	{
-		if (data != NULL && data->release())
-		{
-			delete data;
-			data = NULL;
-		}
 	}
 
 	void Node::detach()
 	{
-		if (data != NULL && data->refCount > 1)
+		if (data != NULL)
 		{
-			Data *newData = new Data(*data);
-			if (data->release())
-			{
-				delete data;
-			}
-			data = newData;
+			data = std::make_shared<Data>(*data);
 		}
 	}
 
@@ -179,6 +169,26 @@ namespace Jzon
 			data->valueStr.clear();
 		}
 	}
+	void Node::set(Type type, const std::string &value)
+	{
+		set(type, value.c_str());
+	}
+	void Node::set(Type type, std::string&& value)
+	{
+		if (isValue() && (type == T_NULL || type == T_STRING || type == T_NUMBER || type == T_BOOL))
+		{
+			detach();
+			data->type = type;
+			if (type == T_STRING)
+			{
+				data->valueStr = unescapeString(value.c_str());
+			}
+			else
+			{
+				data->valueStr = std::move(value);
+			}
+		}
+	}
 	void Node::set(Type type, const char *value)
 	{
 		if (isValue() && (type == T_NULL || type == T_STRING || type == T_NUMBER || type == T_BOOL))
@@ -194,10 +204,6 @@ namespace Jzon
 				data->valueStr = value;
 			}
 		}
-	}
-	void Node::set(Type type, const std::string &value)
-	{
-		set(type, value.c_str());
 	}
 	void Node::set(const std::string &value)
 	{
@@ -236,19 +242,20 @@ namespace Jzon
 	{
 		if (this != &rhs)
 		{
-			if (data != NULL && data->release())
-			{
-				delete data;
-			}
 			data = rhs.data;
-			if (data != NULL)
-			{
-				data->addRef();
-			}
+		}
+		return *this;
+	}
+	Node &Node::operator=(Node &&rhs)
+	{
+		if (this != &rhs)
+		{
+			data = std::move(rhs.data);
 		}
 		return *this;
 	}
 	Node &Node::operator=(const std::string &rhs) { set(rhs); return *this; }
+	Node &Node::operator=(std::string &&rhs) { set(std::move(rhs)); return *this; }
 	Node &Node::operator=(const char *rhs) { set(rhs); return *this; }
 	Node &Node::operator=(int rhs) { set(rhs); return *this; }
 	Node &Node::operator=(unsigned int rhs) { set(rhs); return *this; }
@@ -276,7 +283,7 @@ namespace Jzon
 			data->children.emplace_back(std::make_pair(name, node));
 		}
 	}
-	void Node::add(std::string &&name, const Node &node)
+	void Node::add(std::string&& name, const Node &node)
 	{
 		if (isObject())
 		{
@@ -301,7 +308,7 @@ namespace Jzon
 			data->children.erase(it);
 		}
 	}
-	void Node::remove(const std::string &name)
+	void Node::remove(const char *name)
 	{
 		if (isObject())
 		{
@@ -317,6 +324,10 @@ namespace Jzon
 			}
 		}
 	}
+	void Node::remove(const std::string &name)
+	{
+		remove(name.c_str());
+	}
 	void Node::clear()
 	{
 		if (data != NULL && !data->children.empty())
@@ -325,8 +336,7 @@ namespace Jzon
 			data->children.clear();
 		}
 	}
-
-	bool Node::has(const std::string &name) const
+	bool Node::has(const char *name) const
 	{
 		if (isObject())
 		{
@@ -340,6 +350,10 @@ namespace Jzon
 			}
 		}
 		return false;
+	}
+	bool Node::has(const std::string &name) const
+	{
+		return has(name.c_str());
 	}
 	size_t Node::getCount() const
 	{
@@ -413,26 +427,17 @@ namespace Jzon
 		return !(*this == other);
 	}
 
-	Node::Data::Data(Type type) : refCount(1), type(type)
+	Node::Data::Data(Type type) : type(type)
 	{
 	}
-	Node::Data::Data(const Data &other) : refCount(1), type(other.type), valueStr(other.valueStr), children(other.children)
+	Node::Data::Data(const Data &other) : type(other.type), valueStr(other.valueStr), children(other.children)
 	{
 	}
-	Node::Data::Data(Data &&other) : refCount(1), type(other.type), valueStr(std::move(other.valueStr)), children(std::move(other.children))
+	Node::Data::Data(Data &&other) : type(other.type), valueStr(std::move(other.valueStr)), children(std::move(other.children))
 	{
 	}
 	Node::Data::~Data()
 	{
-		assert(refCount == 0);
-	}
-	void Node::Data::addRef()
-	{
-		++refCount;
-	}
-	bool Node::Data::release()
-	{
-		return (--refCount == 0);
 	}
 
 

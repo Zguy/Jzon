@@ -22,13 +22,14 @@ THE SOFTWARE.
 #ifndef Jzon_h__
 #define Jzon_h__
 
-#include <string>
-#include <vector>
-#include <queue>
 #include <iterator>
 #include <istream>
+#include <memory>
 #include <ostream>
+#include <queue>
+#include <string>
 #include <sstream>
+#include <vector>
 
 #ifndef JZON_API
 #	ifdef JZON_DLL
@@ -117,8 +118,10 @@ namespace Jzon
 		Node();
 		explicit Node(Type type);
 		Node(const Node &other);
+		Node(Node &&other);
 		Node(Type type, const std::string &value);
 		Node(const std::string &value);
+		Node(std::string value);
 		Node(const char *value);
 		Node(int value);
 		Node(unsigned int value);
@@ -152,6 +155,7 @@ namespace Jzon
 
 		void setNull();
 		void set(Type type, const std::string &value);
+		void set(Type type, std::string&& value);
 		void set(Type type, const char *value);
 		void set(const std::string &value);
 		void set(const char *value);
@@ -166,7 +170,9 @@ namespace Jzon
 		void set(bool value);
 
 		Node &operator=(const Node &rhs);
+		Node &operator=(Node &&rhs);
 		Node &operator=(const std::string &rhs);
+		Node &operator=(std::string&& rhs);
 		Node &operator=(const char *rhs);
 		Node &operator=(int rhs);
 		Node &operator=(unsigned int rhs);
@@ -180,12 +186,14 @@ namespace Jzon
 
 		void add(const Node &node);
 		void add(const std::string &name, const Node &node);
-		void add(std::string &&name, const Node &node);
+		void add(std::string&& name, const Node &node);
 		void append(const Node &node);
 		void remove(size_t index);
+		void remove(const char *name);
 		void remove(const std::string &name);
 		void clear();
 
+		bool has(const char *name) const;
 		bool has(const std::string &name) const;
 		size_t getCount() const;
 		Node get(const char *name) const;
@@ -222,14 +230,13 @@ namespace Jzon
 			Data(const Data &other);
 			Data(Data &&other);
 			~Data();
-			void addRef();
-			bool release();
-			int refCount;
 
 			Type type;
 			std::string valueStr;
 			NamedNodeList children;
-		} *data;
+		};
+
+		std::shared_ptr<Data> data;
 	};
 
 	JZON_API std::string escapeString(const std::string &value);
