@@ -22,12 +22,14 @@ THE SOFTWARE.
 #ifndef Jzon_h__
 #define Jzon_h__
 
-#include <string>
-#include <vector>
-#include <queue>
 #include <iterator>
 #include <istream>
+#include <memory>
 #include <ostream>
+#include <queue>
+#include <string>
+#include <sstream>
+#include <vector>
 
 #ifndef JZON_API
 #	ifdef JZON_DLL
@@ -116,11 +118,15 @@ namespace Jzon
 		Node();
 		explicit Node(Type type);
 		Node(const Node &other);
+		Node(Node &&other);
 		Node(Type type, const std::string &value);
 		Node(const std::string &value);
+		Node(std::string&& value);
 		Node(const char *value);
 		Node(int value);
 		Node(unsigned int value);
+		Node(long value);
+		Node(unsigned long value);
 		Node(long long value);
 		Node(unsigned long long value);
 		Node(float value);
@@ -151,10 +157,14 @@ namespace Jzon
 
 		void setNull();
 		void set(Type type, const std::string &value);
+		void set(Type type, std::string&& value);
+		void set(Type type, const char *value);
 		void set(const std::string &value);
 		void set(const char *value);
 		void set(int value);
 		void set(unsigned int value);
+		void set(long value);
+		void set(unsigned long value);
 		void set(long long value);
 		void set(unsigned long long value);
 		void set(float value);
@@ -162,10 +172,14 @@ namespace Jzon
 		void set(bool value);
 
 		Node &operator=(const Node &rhs);
+		Node &operator=(Node &&rhs);
 		Node &operator=(const std::string &rhs);
+		Node &operator=(std::string&& rhs);
 		Node &operator=(const char *rhs);
 		Node &operator=(int rhs);
 		Node &operator=(unsigned int rhs);
+		Node &operator=(long rhs);
+		Node &operator=(unsigned long rhs);
 		Node &operator=(long long rhs);
 		Node &operator=(unsigned long long rhs);
 		Node &operator=(float rhs);
@@ -174,13 +188,17 @@ namespace Jzon
 
 		void add(const Node &node);
 		void add(const std::string &name, const Node &node);
+		void add(std::string&& name, const Node &node);
 		void append(const Node &node);
 		void remove(size_t index);
+		void remove(const char *name);
 		void remove(const std::string &name);
 		void clear();
 
+		bool has(const char *name) const;
 		bool has(const std::string &name) const;
 		size_t getCount() const;
+		Node get(const char *name) const;
 		Node get(const std::string &name) const;
 		Node get(size_t index) const;
 
@@ -194,24 +212,38 @@ namespace Jzon
 		inline operator bool() const { return isValid(); }
 
 	private:
+		template <typename T>
+		inline void set_number(T value)
+		{
+			if (isValue())
+			{
+				detach();
+				data->type = T_NUMBER;
+				std::ostringstream sstr;
+				sstr << value;
+				data->valueStr = sstr.str();
+			}
+		}
+
 		typedef std::vector<NamedNode> NamedNodeList;
 		struct Data
 		{
 			explicit Data(Type type);
 			Data(const Data &other);
+			Data(Data &&other);
 			~Data();
-			void addRef();
-			bool release();
-			int refCount;
 
 			Type type;
 			std::string valueStr;
 			NamedNodeList children;
-		} *data;
+		};
+
+		std::shared_ptr<Data> data;
 	};
 
 	JZON_API std::string escapeString(const std::string &value);
 	JZON_API std::string unescapeString(const std::string &value);
+	JZON_API std::string unescapeString(const char *value);
 
 	JZON_API Node invalid();
 	JZON_API Node null();
